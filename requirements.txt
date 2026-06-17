@@ -1,0 +1,22 @@
+# Core ML / prompt-optimization
+dspy-ai
+
+# Data science
+numpy
+pandas
+scikit-learn
+matplotlib
+
+# NLP utilities
+nltk
+PyYAML
+
+# CLI
+click
+
+# NOTE: The following packages are internal Huawei Jiuwen SDK dependencies
+# and are NOT available on PyPI.  Install them from your private registry
+# or local path before using the online track:
+#
+#   openjiuwen.core   — logging, agent lifecycle
+#   openjiuwen.harness — rail base classes
