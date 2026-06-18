@@ -59,6 +59,13 @@ from data.scenarios.hf.hotpotqa.scenario_loader import load_scenario as load_sce
 from data.scenarios.hf.hotpotqa.scenario_loader import get_scenario_name as get_scenario_name_hotpotqa
 from data.scenarios.hf.gsm8k.scenario_loader import load_scenario as load_scenario_gsm8k
 from data.scenarios.hf.gsm8k.scenario_loader import get_scenario_name as get_scenario_name_gsm8k
+from data.scenarios.synthetic.smarthub_support.scenario_loader import load_scenario as load_scenario_smarthub_support
+from data.scenarios.synthetic.smarthub_support.scenario_loader import get_scenario_name as get_scenario_name_smarthub_support
+from data.scenarios.synthetic.blades_in_the_dark.scenario_loader import load_scenario as load_scenario_blades_in_the_dark
+from data.scenarios.synthetic.blades_in_the_dark.scenario_loader import get_scenario_name as get_scenario_name_blades_in_the_dark
+from data.scenarios.synthetic.pokemon_player.scenario_loader import load_scenario as load_scenario_pokemon_player
+from data.scenarios.synthetic.pokemon_player.scenario_loader import get_scenario_name as get_scenario_name_pokemon_player
+
 from examples.offline.sage.data import Scenario
 
 from examples.offline.sage.data.scenarios.synthetic.code_review.skill.body import \
@@ -97,24 +104,6 @@ from examples.offline.sage.data.scenarios.synthetic.contract_review.skill.frontm
     SKILL_FRONTMATTER as _CT_FM
 from examples.offline.sage.data.scenarios.synthetic.contract_review.golden_examples.all import \
     GOLDEN_EXAMPLES as _CT_EXAMPLES
-from examples.offline.sage.data.scenarios.synthetic.pokemon_player.skill.body import \
-    SKILL_BODY as _PK_BODY
-from examples.offline.sage.data.scenarios.synthetic.pokemon_player.skill.frontmatter import \
-    SKILL_FRONTMATTER as _PK_FM
-from examples.offline.sage.data.scenarios.synthetic.pokemon_player.golden_examples.all import \
-    GOLDEN_EXAMPLES as _PK_EXAMPLES
-from examples.offline.sage.data.scenarios.synthetic.blades_in_the_dark.skill.body import \
-    SKILL_BODY as _BD_BODY
-from examples.offline.sage.data.scenarios.synthetic.blades_in_the_dark.skill.frontmatter import \
-    SKILL_FRONTMATTER as _BD_FM
-from examples.offline.sage.data.scenarios.synthetic.blades_in_the_dark.golden_examples.all import \
-    GOLDEN_EXAMPLES as _BD_EXAMPLES
-from examples.offline.sage.data.scenarios.synthetic.smarthub_support.skill.body import \
-    SKILL_BODY as _SH_BODY
-from examples.offline.sage.data.scenarios.synthetic.smarthub_support.skill.frontmatter import \
-    SKILL_FRONTMATTER as _SH_FM
-from examples.offline.sage.data.scenarios.synthetic.smarthub_support.golden_examples.all import \
-    GOLDEN_EXAMPLES as _SH_EXAMPLES
 
 
 def _load_scenarios() -> Dict[str, Scenario]:
@@ -161,27 +150,9 @@ def _load_scenarios() -> Dict[str, Scenario]:
             golden_examples=_CT_EXAMPLES,
             description="Commercial contract review — penalties, force majeure, IP, non-compete",
         ),
-        "pokemon-player": Scenario(
-            name="pokemon-player",
-            skill_body=_PK_BODY,
-            skill_frontmatter=_PK_FM,
-            golden_examples=_PK_EXAMPLES,
-            description="Pokemon Red/Blue/Yellow gameplay — operational procedure recall (API, actions, paths, prefixes)",
-        ),
-        "blades-in-the-dark": Scenario(
-            name="blades-in-the-dark",
-            skill_body=_BD_BODY,
-            skill_frontmatter=_BD_FM,
-            golden_examples=_BD_EXAMPLES,
-            description="Blades in the Dark GM facilitation — D&D baseline primes systematically wrong answers for BitD mechanics",
-        ),
-        "smarthub-support": Scenario(
-            name="smarthub-support",
-            skill_body=_SH_BODY,
-            skill_frontmatter=_SH_FM,
-            golden_examples=_SH_EXAMPLES,
-            description="SmartHub customer support — generic baseline vs product-specific knowledge (exec demo scenario)",
-        ),
+        get_scenario_name_pokemon_player(): load_scenario_pokemon_player(),
+        get_scenario_name_blades_in_the_dark(): load_scenario_blades_in_the_dark(),
+        get_scenario_name_smarthub_support(): load_scenario_smarthub_support(),
         get_scenario_name_gsm8k(): load_scenario_gsm8k(),
         get_scenario_name_hotpotqa(): load_scenario_hotpotqa(),
         get_scenario_name_pubmedqa():load_scenario_pubmedqa(),
