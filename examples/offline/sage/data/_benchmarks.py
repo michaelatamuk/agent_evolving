@@ -10,15 +10,15 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Dict, List
 
-from .data_loaders.gsm8k_loader import fetch_rows as _gsm8k_rows, load_gsm8k_to_oracle
-from .data_loaders.hotpotqa_loader import fetch_rows as _hotpotqa_rows, load_hotpotqa_to_oracle
-from .data_loaders.pubmedqa_loader import fetch_rows as _pubmedqa_rows, load_pubmedqa_to_oracle
-from .data_loaders.aquarat_loader import fetch_rows as _aquarat_rows, load_aquarat_to_oracle
-from .data_loaders.bbh_loader import load_bbh_to_oracle, DEFAULT_TASKS as _BBH_DEFAULT_TASKS
-from .scenarios.gsm8k.golden_examples.hf_loader import load as _gsm8k_examples
-from .scenarios.hotpotqa.golden_examples.hf_loader import load as _hotpotqa_examples
-from .scenarios.pubmedqa.golden_examples.hf_loader import load as _pubmedqa_examples
-from .scenarios.aquarat.golden_examples.hf_loader import load as _aquarat_examples
+from examples.offline.sage.data.scenarios.hf.data_loaders.gsm8k_loader import fetch_rows as _gsm8k_rows, load_gsm8k_to_oracle
+from examples.offline.sage.data.scenarios.hf.data_loaders import fetch_rows as _hotpotqa_rows, load_hotpotqa_to_oracle
+from examples.offline.sage.data.scenarios.hf.data_loaders import fetch_rows as _pubmedqa_rows, load_pubmedqa_to_oracle
+from examples.offline.sage.data.scenarios.hf.data_loaders.aquarat_loader import fetch_rows as _aquarat_rows, load_aquarat_to_oracle
+from examples.offline.sage.data.scenarios.hf.data_loaders import load_bbh_to_oracle, DEFAULT_TASKS as _BBH_DEFAULT_TASKS
+from examples.offline.sage.data.scenarios.hf.gsm8k.golden_examples.hf_loader import load as _gsm8k_examples
+from examples.offline.sage.data.scenarios.hf.hotpotqa import load as _hotpotqa_examples
+from examples.offline.sage.data.scenarios.hf.pubmedqa import load as _pubmedqa_examples
+from examples.offline.sage.data.scenarios.hf.aquarat import load as _aquarat_examples
 
 
 _ORACLE_BUILDERS: Dict[str, Any] = {

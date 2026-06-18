@@ -50,23 +50,23 @@ from __future__ import annotations
 from typing import Dict, List
 
 from examples.offline.sage.data import Scenario
-from examples.offline.sage.data.data_loaders.gsm8k_loader import (
+from examples.offline.sage.data.scenarios.hf.data_loaders.gsm8k_loader import (
     load_gsm8k_to_oracle as _gsm8k_oracle,
     SKILL_NAME as _GSIM8K_SKILL_NAME,
 )
-from examples.offline.sage.data.data_loaders.hotpotqa_loader import (
+from examples.offline.sage.data.scenarios.hf.data_loaders.hotpotqa_loader import (
     load_hotpotqa_to_oracle as _hp_oracle,
     SKILL_NAME as _HP_SKILL_NAME,
 )
-from examples.offline.sage.data.data_loaders.pubmedqa_loader import (
+from examples.offline.sage.data.scenarios.hf.data_loaders.pubmedqa_loader import (
     load_pubmedqa_to_oracle as _pm_oracle,
     SKILL_NAME as _PM_SKILL_NAME,
 )
-from examples.offline.sage.data.data_loaders.aquarat_loader import (
+from examples.offline.sage.data.scenarios.hf.data_loaders.aquarat_loader import (
     load_aquarat_to_oracle as _aq_oracle,
     SKILL_NAME as _AQ_SKILL_NAME,
 )
-from examples.offline.sage.data.data_loaders.bbh_loader import (
+from examples.offline.sage.data.scenarios.hf.data_loaders.bbh_loader import (
     load_bbh_to_oracle as _bbh_oracle,
     DEFAULT_TASKS as _BBH_DEFAULT_TASKS,
 )
@@ -74,83 +74,83 @@ from examples.offline.sage.data.data_loaders.bbh_loader import (
 
 def _load_scenarios() -> Dict[str, Scenario]:
     """Import each scenario lazily so missing dependencies don't break others."""
-    from examples.offline.sage.data.scenarios.code_review.skill.body import \
+    from examples.offline.sage.data.scenarios.synthetic.code_review.skill.body import \
         SKILL_BODY as _CR_BODY
-    from examples.offline.sage.data.scenarios.code_review.skill.frontmatter import \
+    from examples.offline.sage.data.scenarios.synthetic.code_review.skill.frontmatter import \
         SKILL_FRONTMATTER as _CR_FM
-    from examples.offline.sage.data.scenarios.code_review.golden_examples.all import \
+    from examples.offline.sage.data.scenarios.synthetic.code_review.golden_examples.all import \
         GOLDEN_EXAMPLES as _CR_EXAMPLES
-    from examples.offline.sage.data.scenarios.api_security.skill.body import \
+    from examples.offline.sage.data.scenarios.synthetic.api_security.skill.body import \
         SKILL_BODY as _AS_BODY
-    from examples.offline.sage.data.scenarios.api_security.skill.frontmatter import \
+    from examples.offline.sage.data.scenarios.synthetic.api_security.skill.frontmatter import \
         SKILL_FRONTMATTER as _AS_FM
-    from examples.offline.sage.data.scenarios.api_security.golden_examples.all import \
+    from examples.offline.sage.data.scenarios.synthetic.api_security.golden_examples.all import \
         GOLDEN_EXAMPLES as _AS_EXAMPLES
-    from examples.offline.sage.data.scenarios.ml_review.skill.body import \
+    from examples.offline.sage.data.scenarios.synthetic.ml_review.skill.body import \
         SKILL_BODY as _ML_BODY
-    from examples.offline.sage.data.scenarios.ml_review.skill.frontmatter import \
+    from examples.offline.sage.data.scenarios.synthetic.ml_review.skill.frontmatter import \
         SKILL_FRONTMATTER as _ML_FM
-    from examples.offline.sage.data.scenarios.ml_review.golden_examples.all import \
+    from examples.offline.sage.data.scenarios.synthetic.ml_review.golden_examples.all import \
         GOLDEN_EXAMPLES as _ML_EXAMPLES
-    from examples.offline.sage.data.scenarios.rtos_review.skill.body import \
+    from examples.offline.sage.data.scenarios.synthetic.rtos_review.skill.body import \
         SKILL_BODY as _RT_BODY
-    from examples.offline.sage.data.scenarios.rtos_review.skill.frontmatter import \
+    from examples.offline.sage.data.scenarios.synthetic.rtos_review.skill.frontmatter import \
         SKILL_FRONTMATTER as _RT_FM
-    from examples.offline.sage.data.scenarios.rtos_review.golden_examples.all import \
+    from examples.offline.sage.data.scenarios.synthetic.rtos_review.golden_examples.all import \
         GOLDEN_EXAMPLES as _RT_EXAMPLES
-    from examples.offline.sage.data.scenarios.paper_review.skill.body import \
+    from examples.offline.sage.data.scenarios.synthetic.paper_review.skill.body import \
         SKILL_BODY as _PR_BODY
-    from examples.offline.sage.data.scenarios.paper_review.skill.frontmatter import \
+    from examples.offline.sage.data.scenarios.synthetic.paper_review.skill.frontmatter import \
         SKILL_FRONTMATTER as _PR_FM
-    from examples.offline.sage.data.scenarios.paper_review.golden_examples.all import \
+    from examples.offline.sage.data.scenarios.synthetic.paper_review.golden_examples.all import \
         GOLDEN_EXAMPLES as _PR_EXAMPLES
-    from examples.offline.sage.data.scenarios.contract_review.skill.body import \
+    from examples.offline.sage.data.scenarios.synthetic.contract_review.skill.body import \
         SKILL_BODY as _CT_BODY
-    from examples.offline.sage.data.scenarios.contract_review.skill.frontmatter import \
+    from examples.offline.sage.data.scenarios.synthetic.contract_review.skill.frontmatter import \
         SKILL_FRONTMATTER as _CT_FM
-    from examples.offline.sage.data.scenarios.contract_review.golden_examples.all import \
+    from examples.offline.sage.data.scenarios.synthetic.contract_review.golden_examples.all import \
         GOLDEN_EXAMPLES as _CT_EXAMPLES
-    from examples.offline.sage.data.scenarios.pokemon_player.skill.body import \
+    from examples.offline.sage.data.scenarios.synthetic.pokemon_player.skill.body import \
         SKILL_BODY as _PK_BODY
-    from examples.offline.sage.data.scenarios.pokemon_player.skill.frontmatter import \
+    from examples.offline.sage.data.scenarios.synthetic.pokemon_player.skill.frontmatter import \
         SKILL_FRONTMATTER as _PK_FM
-    from examples.offline.sage.data.scenarios.pokemon_player.golden_examples.all import \
+    from examples.offline.sage.data.scenarios.synthetic.pokemon_player.golden_examples.all import \
         GOLDEN_EXAMPLES as _PK_EXAMPLES
-    from examples.offline.sage.data.scenarios.blades_in_the_dark.skill.body import \
+    from examples.offline.sage.data.scenarios.synthetic.blades_in_the_dark.skill.body import \
         SKILL_BODY as _BD_BODY
-    from examples.offline.sage.data.scenarios.blades_in_the_dark.skill.frontmatter import \
+    from examples.offline.sage.data.scenarios.synthetic.blades_in_the_dark.skill.frontmatter import \
         SKILL_FRONTMATTER as _BD_FM
-    from examples.offline.sage.data.scenarios.blades_in_the_dark.golden_examples.all import \
+    from examples.offline.sage.data.scenarios.synthetic.blades_in_the_dark.golden_examples.all import \
         GOLDEN_EXAMPLES as _BD_EXAMPLES
-    from examples.offline.sage.data.scenarios.smarthub_support.skill.body import \
+    from examples.offline.sage.data.scenarios.synthetic.smarthub_support.skill.body import \
         SKILL_BODY as _SH_BODY
-    from examples.offline.sage.data.scenarios.smarthub_support.skill.frontmatter import \
+    from examples.offline.sage.data.scenarios.synthetic.smarthub_support.skill.frontmatter import \
         SKILL_FRONTMATTER as _SH_FM
-    from examples.offline.sage.data.scenarios.smarthub_support.golden_examples.all import \
+    from examples.offline.sage.data.scenarios.synthetic.smarthub_support.golden_examples.all import \
         GOLDEN_EXAMPLES as _SH_EXAMPLES
-    from examples.offline.sage.data.scenarios.gsm8k.skill.body import \
+    from examples.offline.sage.data.scenarios.hf.gsm8k.skill.body import \
         SKILL_BODY as _GS_BODY
-    from examples.offline.sage.data.scenarios.gsm8k.skill.frontmatter import \
+    from examples.offline.sage.data.scenarios.hf.gsm8k.skill.frontmatter import \
         SKILL_FRONTMATTER as _GS_FM
-    from examples.offline.sage.data.scenarios.hotpotqa.skill.body import \
+    from examples.offline.sage.data.scenarios.hf.hotpotqa.skill.body import \
         SKILL_BODY as _HP_BODY
-    from examples.offline.sage.data.scenarios.hotpotqa.skill.frontmatter import \
+    from examples.offline.sage.data.scenarios.hf.hotpotqa.skill.frontmatter import \
         SKILL_FRONTMATTER as _HP_FM
-    from examples.offline.sage.data.scenarios.pubmedqa.skill.body import \
+    from examples.offline.sage.data.scenarios.hf.pubmedqa.skill.body import \
         SKILL_BODY as _PM_BODY
-    from examples.offline.sage.data.scenarios.pubmedqa.skill.frontmatter import \
+    from examples.offline.sage.data.scenarios.hf.pubmedqa.skill.frontmatter import \
         SKILL_FRONTMATTER as _PM_FM
-    from examples.offline.sage.data.scenarios.aquarat.skill.body import \
+    from examples.offline.sage.data.scenarios.hf.aquarat.skill.body import \
         SKILL_BODY as _AQ_BODY
-    from examples.offline.sage.data.scenarios.aquarat.skill.frontmatter import \
+    from examples.offline.sage.data.scenarios.hf.aquarat.skill.frontmatter import \
         SKILL_FRONTMATTER as _AQ_FM
-    from examples.offline.sage.data.scenarios.gsm8k.golden_examples.hf_loader import \
+    from examples.offline.sage.data.scenarios.hf.gsm8k.golden_examples.hf_loader import \
         load as _GS_LOADER
-    from examples.offline.sage.data.scenarios.hotpotqa.golden_examples.hf_loader import \
+    from examples.offline.sage.data.scenarios.hf.hotpotqa.golden_examples.hf_loader import \
         load as _HP_LOADER
-    from examples.offline.sage.data.scenarios.pubmedqa.golden_examples.hf_loader import \
+    from examples.offline.sage.data.scenarios.hf.pubmedqa.golden_examples.hf_loader import \
         load as _PM_LOADER
-    from examples.offline.sage.data.scenarios.aquarat.golden_examples.hf_loader import \
+    from examples.offline.sage.data.scenarios.hf.aquarat.golden_examples.hf_loader import \
         load as _AQ_LOADER
 
     return {
