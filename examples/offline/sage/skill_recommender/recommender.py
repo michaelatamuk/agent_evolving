@@ -40,7 +40,6 @@ import pandas as pd
 
 from .embedder import Embedder, Backend
 from .matrix_store import load_matrix, norm_columns, metric_columns
-from .runner_args import DEFAULT_ORACLE_DIR
 
 
 class SkillRecommender:
@@ -199,7 +198,7 @@ class SkillRecommender:
 # ── Convenience factory ───────────────────────────────────────────────────────
 
 def build_recommender(
-    oracle_dir: Path | str = DEFAULT_ORACLE_DIR,
+    oracle_dir: Path | str,
     variant: Literal["baseline", "evolved", "both"] = "baseline",
     embedder_method: Backend = "tfidf",
 ) -> SkillRecommender:

@@ -6,7 +6,6 @@ import tempfile
 from pathlib import Path
 
 from .recommender import build_recommender
-from .runner_args import DEFAULT_ORACLE_DIR
 from .runner_printer import _print_benchmark_results
 
 
@@ -43,7 +42,7 @@ def _benchmark_loaders() -> dict:
     }
 
 
-def _run_benchmarks(args: argparse.Namespace) -> None:
+def _run_benchmarks(args: argparse.Namespace, DEFAULT_ORACLE_DIR) -> None:
     """Download benchmarks, build recommender, show routing accuracy."""
     benchmarks = args.benchmarks if args.benchmarks else ALL_BENCHMARKS
     n_examples     = args.n_examples

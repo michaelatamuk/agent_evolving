@@ -61,14 +61,7 @@ Run as module
 """
 from __future__ import annotations
 
-import argparse
-import contextlib
-import json
-import sys
-import tempfile
-from pathlib import Path
-
-from examples.offline.sage.skill_recommender.runner_args import args_parser
+from examples.offline.sage.skill_recommender.runner_args import args_parser, DEFAULT_ORACLE_DIR
 from examples.offline.sage.skill_recommender.runner_benchmarks import _run_benchmarks
 from examples.offline.sage.skill_recommender.runner_demo import _run_demo
 from examples.offline.sage.skill_recommender.runner_query import _run_query
@@ -83,7 +76,7 @@ def main() -> None:
     if args.demo:
         _run_demo()
     elif args.benchmarks is not None:
-        _run_benchmarks(args)
+        _run_benchmarks(args, DEFAULT_ORACLE_DIR)
     else:
         _run_query(args)
 

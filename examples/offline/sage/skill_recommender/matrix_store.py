@@ -31,7 +31,6 @@ import sys
 from pathlib import Path
 
 import pandas as pd
-from .runner_args import DEFAULT_ORACLE_DIR
 
 
 # ── Low-level helpers ─────────────────────────────────────────────────────────
@@ -142,7 +141,7 @@ def _normalise_rows(df: pd.DataFrame) -> pd.DataFrame:
 # ── Public API ────────────────────────────────────────────────────────────────
 
 def load_matrix(
-    oracle_dir: Path = DEFAULT_ORACLE_DIR,
+    oracle_dir: Path,
     variant: str = "baseline",
 ) -> pd.DataFrame:
     """Load the 3-D skill matrix from all scoring_matrix_*.json in *oracle_dir*.

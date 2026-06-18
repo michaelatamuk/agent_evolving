@@ -44,7 +44,7 @@ import argparse
 import sys
 from pathlib import Path
 
-from .oracle_trainer import train
+from examples.offline.sage.fitness_metrics_oracle.oracle_trainer import train
 
 # ── CLI ────────────────────────────────────────────────────────────────────────
 DEFAULT_ORACLE_DIR = Path("~/.openjiuwen/oracle").expanduser()

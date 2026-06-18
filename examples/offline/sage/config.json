@@ -1,14 +1,7 @@
 {
     "scenarios": [
         "paper-review",
-        "contract-review",
-        "rtos-review",
-        "ml-review",
-        "api-security",
-        "code-review",
-        "pokemon-player",
-        "blades-in-the-dark",
-        "smarthub-support"
+        "contract-review"
     ],
     "_scenarios": [
         "paper-review",
@@ -26,7 +19,7 @@
     "api_key": "sk-c3a1d0d605d24dfc90cb487b6a2465a4",
     "model": "deepseek/deepseek-chat",
     "api_base": "https://api.deepseek.com",
-    "iterations": 2,
+    "iterations": 1,
     "ts_batch_size": 4,
     "n_runs": 1,
     "verbose": false,

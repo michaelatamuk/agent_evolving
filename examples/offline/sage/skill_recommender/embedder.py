@@ -23,6 +23,7 @@ Usage
 """
 from __future__ import annotations
 
+from sklearn.feature_extraction.text import TfidfVectorizer
 import os
 from typing import Literal
 
