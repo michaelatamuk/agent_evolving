@@ -50,23 +50,23 @@ from __future__ import annotations
 from typing import Dict, List
 
 from examples.offline.sage.data import Scenario
-from examples.offline.sage.data.scenarios.hf.data_loaders.gsm8k_loader import (
+from examples.offline.sage.data.scenarios.hf.gsm8k.gsm8k_loader import (
     load_gsm8k_to_oracle as _gsm8k_oracle,
     SKILL_NAME as _GSIM8K_SKILL_NAME,
 )
-from examples.offline.sage.data.scenarios.hf.data_loaders.hotpotqa_loader import (
+from examples.offline.sage.data.scenarios.hf.hotpotqa.hotpotqa_loader import (
     load_hotpotqa_to_oracle as _hp_oracle,
     SKILL_NAME as _HP_SKILL_NAME,
 )
-from examples.offline.sage.data.scenarios.hf.data_loaders.pubmedqa_loader import (
+from examples.offline.sage.data.scenarios.hf.pubmedqa.pubmedqa_loader import (
     load_pubmedqa_to_oracle as _pm_oracle,
     SKILL_NAME as _PM_SKILL_NAME,
 )
-from examples.offline.sage.data.scenarios.hf.data_loaders.aquarat_loader import (
+from examples.offline.sage.data.scenarios.hf.aquarat.aquarat_loader import (
     load_aquarat_to_oracle as _aq_oracle,
     SKILL_NAME as _AQ_SKILL_NAME,
 )
-from examples.offline.sage.data.scenarios.hf.data_loaders.bbh_loader import (
+from examples.offline.sage.data.scenarios.hf.bbh.bbh_loader import (
     load_bbh_to_oracle as _bbh_oracle,
     DEFAULT_TASKS as _BBH_DEFAULT_TASKS,
 )

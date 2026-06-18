@@ -25,7 +25,7 @@ def load(n: int = 50, seed: int = 42) -> List[Dict[str, Any]]:
     seed:
         Random seed for reproducible sampling.
     """
-    from examples.offline.sage.data.scenarios.hf.data_loaders.hotpotqa_loader import (
+    from examples.offline.sage.data.scenarios.hf.hotpotqa.hotpotqa_loader import (
         fetch_rows,
     )
 
