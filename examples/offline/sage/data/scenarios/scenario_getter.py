@@ -50,7 +50,7 @@ from __future__ import annotations
 from typing import Dict, List
 
 from .scenario import Scenario
-from .scenario_loader import _load_scenarios
+from .scenarios_loader import _load_scenarios
 
 
 def get_scenario(name: str) -> Scenario:
