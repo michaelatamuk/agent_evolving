@@ -3,18 +3,18 @@
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/examples/offline/sage/data/scenarios/synthetic/api_security" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/examples/offline/sage/data/scenarios/synthetic/blades_in_the_dark" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/examples/offline/sage/data/scenarios/synthetic/code_review" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/examples/offline/sage/data/scenarios/synthetic/contract_review" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/examples/offline/sage/data/scenarios/synthetic/ml_review" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/examples/offline/sage/data/scenarios/synthetic/paper_review" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/examples/offline/sage/data/scenarios/synthetic/pokemon_player" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/examples/offline/sage/data/scenarios/synthetic/rtos_review" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/examples/offline/sage/data/scenarios/synthetic/smarthub_support" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/examples/offline/sage/data/synthetic/api_security" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/examples/offline/sage/data/synthetic/blades_in_the_dark" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/examples/offline/sage/data/synthetic/code_review" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/examples/offline/sage/data/synthetic/contract_review" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/examples/offline/sage/data/synthetic/ml_review" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/examples/offline/sage/data/synthetic/paper_review" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/examples/offline/sage/data/synthetic/pokemon_player" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/examples/offline/sage/data/synthetic/rtos_review" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/examples/offline/sage/data/synthetic/smarthub_support" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/.venv" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.12 (agent_evolving)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.14 (agent_evolving) (3)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>

@@ -5,6 +5,20 @@
       <set>
         <option value="$PROJECT_DIR$/examples/offline/sage/data" />
         <option value="$PROJECT_DIR$/examples/offline/sage" />
+        <option value="$PROJECT_DIR$/examples/offline/sage/data/scenarios/hf" />
+        <option value="$PROJECT_DIR$/examples/offline/sage/data/scenarios/hf/pubmedqa" />
+        <option value="$PROJECT_DIR$/examples/offline/sage/data/scenarios/hf/hotpotqa" />
+        <option value="$PROJECT_DIR$/examples/offline/sage/data/scenarios/hf/aquarat" />
+        <option value="$PROJECT_DIR$/examples/offline/sage/data/scenarios/hf/gsm8k" />
+        <option value="$PROJECT_DIR$/examples/offline/sage/data/scenarios/synthetic/api_security" />
+        <option value="$PROJECT_DIR$/examples/offline/sage/data/scenarios/synthetic/contract_review" />
+        <option value="$PROJECT_DIR$/examples/offline/sage/data/scenarios/synthetic/paper_review" />
+        <option value="$PROJECT_DIR$/examples/offline/sage/data/scenarios/synthetic/ml_review" />
+        <option value="$PROJECT_DIR$/examples/offline/sage/data/scenarios/synthetic/smarthub_support" />
+        <option value="$PROJECT_DIR$/examples/offline/sage/data/scenarios/synthetic/blades_in_the_dark" />
+        <option value="$PROJECT_DIR$/examples/offline/sage/data/scenarios/synthetic/pokemon_player" />
+        <option value="$PROJECT_DIR$/examples/offline/sage/data/scenarios/synthetic/rtos_review" />
+        <option value="$PROJECT_DIR$/examples/offline/sage/data/scenarios/synthetic/code_review" />
       </set>
     </option>
   </component>

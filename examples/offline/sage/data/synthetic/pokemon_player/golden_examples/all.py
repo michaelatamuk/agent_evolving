@@ -23,13 +23,13 @@
 # Expected baseline holdout score:  ~0.10–0.25
 # Expected evolved holdout score:   ~0.70–0.90
 
-from examples.offline.sage.data.scenarios.synthetic.pokemon_player.golden_examples.easy import (
+from golden_examples.easy import (
     GOLDEN_EXAMPLES_EASY,
 )
-from examples.offline.sage.data.scenarios.synthetic.pokemon_player.golden_examples.medium import (
+from golden_examples.medium import (
     GOLDEN_EXAMPLES_MEDIUM,
 )
-from examples.offline.sage.data.scenarios.synthetic.pokemon_player.golden_examples.hard import (
+from golden_examples.hard import (
     GOLDEN_EXAMPLES_HARD,
 )
 

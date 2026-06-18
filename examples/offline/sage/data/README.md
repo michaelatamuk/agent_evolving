@@ -115,34 +115,11 @@ print(scenario.skill_frontmatter)
 
 ---
 
-## Scoring utilities
-
-Available directly from the scoring module (not re-exported via `data`):
-
-```python
-from examples.offline.sage.data._scoring import compute_scores, FITNESS_METRICS
-
-print(FITNESS_METRICS)   # ["exact_match", "f1", "bag_of_words"]
-
-scores = compute_scores(output="The answer is 18.", expected="18")
-# {"exact_match": 0.0, "f1": 0.4, "bag_of_words": 0.25}
-```
-
-| Metric | Description |
-|--------|-------------|
-| `exact_match` | 1.0 if strings match after strip/lower, else 0.0 |
-| `f1` | Token-level F1 (punctuation removed) |
-| `bag_of_words` | Jaccard over token sets |
-
----
-
 ## Package layout
 
 ```
 data/
 ├── __init__.py              # Scenario, get_scenario, list_scenarios only
-├── _scoring.py              # compute_scores, FITNESS_METRICS
-├── _benchmarks.py           # oracle builder implementations (internal)
 ├── io/
 │   ├── writer_skill.py      # write SKILL.md to disk
 │   ├── writer_golden_dataset.py   # write golden dataset splits to disk

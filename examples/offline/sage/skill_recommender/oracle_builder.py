@@ -16,7 +16,7 @@ import re
 from pathlib import Path
 from typing import Any, Dict, List
 
-from examples.offline.sage.data._scoring import FITNESS_METRICS, compute_scores
+from examples.offline.sage.skill_recommender._scoring import FITNESS_METRICS, compute_scores
 
 
 def build_oracle_from_examples(

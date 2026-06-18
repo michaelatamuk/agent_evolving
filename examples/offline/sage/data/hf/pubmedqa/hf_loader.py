@@ -41,7 +41,7 @@ def load(n: int = 50, seed: int = 42) -> List[Dict[str, Any]]:
     seed:
         Random seed for reproducible sampling.
     """
-    from examples.offline.sage.data.scenarios.hf.pubmedqa.pubmedqa_loader import fetch_rows
+    from examples.offline.sage.data.hf.pubmedqa.pubmedqa_loader import fetch_rows
 
     raw_rows = fetch_rows(n=n, seed=seed)
     examples: List[Dict[str, Any]] = []

@@ -44,7 +44,7 @@ def load(n: int = 50, seed: int = 42) -> List[Dict[str, Any]]:
     seed:
         Random seed for reproducible sampling.
     """
-    from examples.offline.sage.data.scenarios.hf.gsm8k.gsm8k_loader import fetch_rows
+    from examples.offline.sage.data.hf.gsm8k.gsm8k_loader import fetch_rows
 
     return [
         {
