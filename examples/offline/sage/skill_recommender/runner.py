@@ -3,7 +3,7 @@
 """
 runner.py — Skill Recommender  (single entry point)
 
-Three modes selected by flags:
+Two modes selected by flags:
 
   QUERY MODE  (default — no mode flag)
   ─────────────────────────────────────
@@ -16,24 +16,18 @@ Three modes selected by flags:
       python runner.py --list-skills
       python runner.py "some prompt" --cache-embedder /tmp/emb.pkl
 
-  DEMO MODE  (--demo)
-  ────────────────────
-  Zero-network quick start.  Creates a small in-memory synthetic scoring
-  matrix and runs three sample queries so you can see the output format
-  without a real GEPA run.
-
-      python runner.py --demo
-
   BENCHMARK MODE  (--benchmarks [NAME ...])
   ──────────────────────────────────────────
-  Downloads benchmark datasets from HuggingFace, builds a scoring matrix
-  from deterministic baselines, and shows routing accuracy.
+  Builds a scoring matrix from scenario examples and shows routing accuracy.
+  Works with any scenario that has an oracle_builder — both synthetic (no
+  network) and HuggingFace benchmarks.
 
-      python runner.py --benchmarks                     # all 5 benchmarks
-      python runner.py --benchmarks gsm8k hotpotqa      # specific subset
+      python runner.py --benchmarks                          # all scenarios
+      python runner.py --benchmarks smarthub-support code-review  # no network
+      python runner.py --benchmarks gsm8k hotpotqa          # HF download
       python runner.py --benchmarks bbh --oracle-dir /tmp/bbh_oracle
 
-  Available benchmarks: bbh · gsm8k · hotpotqa · pubmedqa · aquarat
+  Available: any name from list_scenarios() with oracle_builder set.
 
 Common options
 ──────────────
@@ -63,7 +57,6 @@ from __future__ import annotations
 
 from examples.offline.sage.skill_recommender.runner_args import args_parser, DEFAULT_ORACLE_DIR
 from examples.offline.sage.skill_recommender.runner_benchmarks import _run_benchmarks
-from examples.offline.sage.skill_recommender.runner_demo import _run_demo
 from examples.offline.sage.skill_recommender.runner_query import _run_query
 
 
@@ -72,10 +65,7 @@ from examples.offline.sage.skill_recommender.runner_query import _run_query
 def main() -> None:
     args = args_parser()
 
-    # ── Dispatch ──────────────────────────────────────────────────────────
-    if args.demo:
-        _run_demo()
-    elif args.benchmarks is not None:
+    if args.benchmarks is not None:
         _run_benchmarks(args, DEFAULT_ORACLE_DIR)
     else:
         _run_query(args)

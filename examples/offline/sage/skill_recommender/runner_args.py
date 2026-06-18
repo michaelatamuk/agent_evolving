@@ -13,17 +13,12 @@ DEFAULT_ORACLE_DIR  = Path("~/.openjiuwen/oracle").expanduser()
 
 def args_parser():
     parser = argparse.ArgumentParser(prog="runner.py",
-                                     description="Skill Recommender — query, demo, or benchmark mode.",
+                                     description="Skill Recommender — query or benchmark mode.",
                                      formatter_class=argparse.RawDescriptionHelpFormatter,
                                      epilog=__doc__,)
 
     # ── Mode flags ────────────────────────────────────────────────────────
     mode_group = parser.add_mutually_exclusive_group()
-    mode_group.add_argument("--demo",
-                            action="store_true",
-                            default=False,
-                            help="Run the synthetic quick-start demo (no network required).")
-
     _AVAILABLE_BENCHMARKS = [s.name for s in list_scenarios() if s.oracle_builder is not None]
     mode_group.add_argument("--benchmarks",
                             nargs="*",
