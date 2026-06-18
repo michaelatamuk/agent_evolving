@@ -1,7 +1,7 @@
 from ...scenario import Scenario
 from .skill.body import SKILL_BODY
 from .skill.frontmatter import SKILL_FRONTMATTER
-from .hf_loader import load
+from .data_loader import load
 
 
 def load_scenario():
