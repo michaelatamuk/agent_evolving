@@ -2,7 +2,8 @@
 from __future__ import annotations
 
 from examples.offline.sage.demo.helpers.printer_skill import _print_skill
-from examples.offline.sage.data import write_golden_dataset, write_skill
+from examples.offline.sage.demo.io.writer_golden_dataset import write_golden_dataset
+from examples.offline.sage.demo.io.writer_skill import write_skill
 
 
 def run_step(skills_root, skill_name, skill_body, skill_frontmatter, examples, verbose: bool = False, console = None):

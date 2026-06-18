@@ -1,6 +1,7 @@
 
 from __future__ import annotations
 
+from examples.offline.sage.demo.io.reader_latest_evolved import read_latest_evolved
 from examples.offline.sage.demo.steps.steps_shared_object import \
     SharedEvolutionObjects
 from agent_evolving.offline.evolvers.skill_evolver_single_params import SkillEvolverParams
@@ -9,7 +10,6 @@ from examples.offline.sage.demo.helpers.printer_banner import _banner
 from examples.offline.sage.demo.helpers.printer_skill import _print_skill
 from examples.offline.sage.demo.helpers.printer_ts_insights import \
     _print_ts_insights
-from examples.offline.sage.data import read_latest_evolved
 
 
 def run_step(shared_evolution_object: SharedEvolutionObjects,

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from examples.offline.sage.demo.io.reader_latest_evolved import read_latest_evolved
 from examples.offline.sage.demo.steps.steps_shared_object import \
     SharedEvolutionObjects
 from agent_evolving.offline.evolvers._console_maker import _make_console
@@ -24,7 +25,6 @@ from examples.offline.sage.demo.steps.step_09_final_prints import \
     run_step as step_09_final_prints
 from examples.offline.sage.demo.helpers.printer_skill_diff import \
     print_skill_diff
-from examples.offline.sage.data import read_latest_evolved
 
 
 class Demo:

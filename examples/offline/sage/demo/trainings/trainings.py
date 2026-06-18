@@ -7,13 +7,13 @@ from typing import Dict, List, Optional, Tuple
 
 from examples.offline.sage.demo.demo_config import DemoConfig
 from examples.offline.sage.demo.demo_params import DemoParams
+from examples.offline.sage.demo.io.writer_skill import write_skill
 from examples.offline.sage.demo.trainings.results import (
     DemoTrainingsResults,
     run_key_label,
 )
 from examples.offline.sage.demo.helpers.printer_mode_summary import \
     print_mode_summary, print_mode_timing
-from examples.offline.sage.data import write_skill
 from examples.offline.sage.demo.steps.steps_shared_object import \
     SharedEvolutionObjects
 from examples.offline.sage.demo.steps.step_03_run_gepa_plain import \
