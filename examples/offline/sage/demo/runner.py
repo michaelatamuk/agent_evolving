@@ -82,7 +82,7 @@ from __future__ import annotations
 import tempfile
 from pathlib import Path
 
-from examples.offline.sage.config_loader import load_config
+from examples.offline.sage.demo.config_loader import load_config
 from examples.offline.sage.demo.demo import Demo
 from examples.offline.sage.demo.demo_params import DemoParams
 from examples.offline.sage.data import Scenario, get_scenario
