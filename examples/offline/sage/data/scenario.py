@@ -24,10 +24,6 @@ class Scenario:
         Body text of the SKILL.md file (the part after the ``---`` frontmatter).
     skill_frontmatter:
         Frontmatter content between the ``---`` delimiters (YAML key-value pairs).
-    golden_examples:
-        Static list of golden example dicts (always available, no network needed).
-        Each dict must have ``task_input``, ``expected_behavior``, ``difficulty``,
-        and ``source``.
     description:
         One-line human-readable description shown in the runner banner.
     loader:
@@ -44,7 +40,6 @@ class Scenario:
     skill_body: str
     skill_frontmatter: str
     description: str = ""
-    golden_examples: List[Dict[str, Any]] = field(default_factory=list)
     loader: Optional[Callable[..., List[Dict[str, Any]]]] = field(default=None, repr=False)
     sample_query: Optional[str] = None
 
@@ -66,17 +61,10 @@ class Scenario:
         seed:
             Random seed for reproducible sampling.
         """
-        if self.loader is None:
-            return self.golden_examples
-        try:
+        if self.loader:
             return self.loader(n=n, seed=seed)
-        except Exception as exc:
-            print(
-                f"  [WARN] HuggingFace loader for '{self.name}' failed "
-                f"({exc}); falling back to {len(self.golden_examples)} "
-                "static examples."
-            )
-            return self.golden_examples
+        else:
+            return []
 
     def split(
         self,

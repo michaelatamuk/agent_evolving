@@ -119,7 +119,7 @@ if __name__ == "__main__":
         print(f"{'═' * 70}")
         print(f"Scenario          : {scenario.name}  —  {scenario.description}")
         print(f"Working directory : {workdir}")
-        print(f"Golden examples   : {len(scenario.golden_examples)}  "
+        print(f"Examples   : {len(scenario.load_examples())}  "
               f"({counts.get('easy', 0)} easy / "
               f"{counts.get('medium', 0)} medium / "
               f"{counts.get('hard', 0)} hard)")

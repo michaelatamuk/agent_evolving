@@ -9,7 +9,6 @@ def load_scenario():
             name=get_scenario_name(),
             skill_body=SKILL_BODY,
             skill_frontmatter=SKILL_FRONTMATTER,
-            golden_examples=[],
             description="AQuA-RAT algebra word problems — full working + correct option letter (OPRO benchmark)",
             loader=load,
             sample_query=(
