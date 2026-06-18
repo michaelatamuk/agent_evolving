@@ -56,8 +56,8 @@ from __future__ import annotations
 from pathlib import Path
 
 from examples.offline.sage.skill_recommender.runner_args import args_parser
-from examples.offline.sage.skill_recommender.self_test.runner_self_test import _run_self_test
-from examples.offline.sage.skill_recommender.query.runner_query import _run_query
+from examples.offline.sage.skill_recommender.self_test.mode_runner import _run_self_test
+from examples.offline.sage.skill_recommender.query.mode_runner import _run_query
 
 DEFAULT_ORACLE_DIR  = Path("~/.openjiuwen/oracle").expanduser()
 

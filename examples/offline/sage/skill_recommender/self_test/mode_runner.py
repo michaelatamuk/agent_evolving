@@ -5,8 +5,8 @@ import contextlib
 import tempfile
 from pathlib import Path
 
-from .self_test_oracle_builder import build_oracle_from_examples
-from .self_text_results_printer import _print_benchmark_results
+from .oracle_builder import build_oracle_from_examples
+from .results_printer import _print_benchmark_results
 from ..recommender_builder import build_recommender
 from ...data import list_scenarios
 
