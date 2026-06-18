@@ -28,22 +28,22 @@ for s in list_scenarios():
 
 **All 14 scenario names:**
 
-| Name | Domain | Oracle? |
-|------|--------|---------|
-| `paper-review` | Research paper peer review ★ recommended | |
-| `contract-review` | Commercial contract review ★ recommended | |
-| `rtos-review` | Embedded C / FreeRTOS ★ recommended | |
-| `smarthub-support` | Customer support (exec demo) ★ recommended | |
-| `ml-review` | ML/data-science code review | |
-| `api-security` | REST API security review | |
-| `code-review` | Python code review | |
-| `pokemon-player` | Game domain (Pokemon) | |
-| `blades-in-the-dark` | TTRPG GM facilitation | |
-| `gsm8k` | Grade-school math | ✓ |
-| `hotpotqa` | Multi-hop QA | ✓ |
-| `pubmedqa` | Biomedical QA | ✓ |
-| `aquarat` | Algebra word problems | ✓ |
-| `bbh` | Big-Bench Hard (multi-task) | ✓ |
+| Name | Type | Domain |
+|------|------|--------|
+| `paper-review` | synthetic | Research paper peer review ★ recommended |
+| `contract-review` | synthetic | Commercial contract review ★ recommended |
+| `rtos-review` | synthetic | Embedded C / FreeRTOS ★ recommended |
+| `smarthub-support` | synthetic | Customer support (exec demo) ★ recommended |
+| `ml-review` | synthetic | ML/data-science code review |
+| `api-security` | synthetic | REST API security review |
+| `code-review` | synthetic | Python code review |
+| `pokemon-player` | synthetic | Game domain (Pokemon) |
+| `blades-in-the-dark` | synthetic | TTRPG GM facilitation |
+| `gsm8k` | HF benchmark | Grade-school math |
+| `hotpotqa` | HF benchmark | Multi-hop QA |
+| `pubmedqa` | HF benchmark | Biomedical QA |
+| `aquarat` | HF benchmark | Algebra word problems |
+| `bbh` | HF benchmark | Big-Bench Hard (multi-task, no single skill) |
 
 ---
 
@@ -53,11 +53,11 @@ Same call for every scenario — client does not know or care whether data is
 local or from HuggingFace:
 
 ```python
-# local scenario: returns static golden_examples, no network needed
+# synthetic scenario: returns static golden_examples, no network needed
 scenario = get_scenario("paper-review")
 examples = scenario.load_examples()
 
-# HF benchmark scenario: fetches from HuggingFace, falls back to static on failure
+# HF benchmark scenario: fetches from HuggingFace
 scenario = get_scenario("gsm8k")
 examples = scenario.load_examples(n=100, seed=42)
 ```
@@ -69,32 +69,24 @@ Each example dict:
     "task_input":        str,   # the question / code to evaluate
     "expected_behavior": str,   # gold answer
     "difficulty":        str,   # "easy" | "medium" | "hard"
-    "source":            str,   # e.g. "gsm8k-hf"
+    "source":            str,   # e.g. "gsm8k-hf" or "synthetic"
 }
 ```
 
-Static examples are always available at `scenario.golden_examples` with no
-network call.
+> `bbh` has no loader and returns `[]` — it is a meta-benchmark with no single
+> skill or unified example format.
 
 ---
 
-## Building oracle files (skill_recommender)
-
-Only benchmark scenarios (those with ✓ above) support `build_oracle`.
-The call is identical regardless of which benchmark:
+## Train / val split
 
 ```python
-from pathlib import Path
-
-oracle_dir = Path("/tmp/oracle")
-
-get_scenario("gsm8k").build_oracle(oracle_dir, n_examples=50, overwrite=False)
-get_scenario("hotpotqa").build_oracle(oracle_dir, n_examples=50)
-get_scenario("bbh").build_oracle(oracle_dir, n_examples=50)
-
-# calling on a local-only scenario raises NotImplementedError
-get_scenario("paper-review").build_oracle(oracle_dir)  # ← raises
+scenario = get_scenario("paper-review")
+trainset, valset = scenario.split(n=50, seed=42, train_ratio=0.8)
 ```
+
+`split()` loads examples, shuffles with the given seed, and cuts at `train_ratio`.
+Works identically for synthetic and HF scenarios.
 
 ---
 
@@ -111,7 +103,7 @@ print(scenario.skill_frontmatter)
 ```
 
 > `bbh` has empty `skill_body` / `skill_frontmatter` — it is a meta-benchmark
-> with no single skill, so it is only useful for `build_oracle`.
+> with no single skill.
 
 ---
 
@@ -119,16 +111,32 @@ print(scenario.skill_frontmatter)
 
 ```
 data/
-├── __init__.py              # Scenario, get_scenario, list_scenarios only
-├── io/
-│   ├── writer_skill.py      # write SKILL.md to disk
-│   ├── writer_golden_dataset.py   # write golden dataset splits to disk
-│   └── reader_latest_evolved.py   # read latest evolved skill from output dir
-├── data_loaders/            # per-benchmark HuggingFace loaders (internal)
-└── scenarios/
-    ├── scenario.py          # Scenario dataclass  (load_examples, build_oracle)
-    ├── scenario_getter.py   # registry: get_scenario, list_scenarios
-    └── <name>/
-        ├── skill/body.py + frontmatter.py
-        └── golden_examples/all.py  (+ easy/medium/hard + hf_loader.py for HF benchmarks)
+├── __init__.py              # re-exports Scenario, get_scenario, list_scenarios
+├── scenario.py              # Scenario dataclass: load_examples, split, example_counts
+├── scenario_getter.py       # get_scenario(name), list_scenarios()
+├── scenarios_loader.py      # internal registry — loads all scenario modules
+├── tester.py                # standalone inspector script
+├── hf/                      # HuggingFace benchmark scenarios
+│   ├── gsm8k/               # openai/gsm8k — grade-school math
+│   ├── hotpotqa/            # hotpotqa/hotpot_qa — multi-hop QA
+│   ├── pubmedqa/            # qiaojin/PubMedQA — biomedical yes/no/maybe
+│   ├── aquarat/             # deepmind/aqua_rat — algebra word problems
+│   └── bbh/                 # Big-Bench Hard (no loader, placeholder only)
+└── synthetic/               # Hand-crafted golden example scenarios
+    ├── api_security/
+    ├── blades_in_the_dark/
+    ├── code_review/
+    ├── contract_review/
+    ├── ml_review/
+    ├── paper_review/
+    ├── pokemon_player/
+    ├── rtos_review/
+    └── smarthub_support/
+
+Each scenario directory contains:
+    scenario_loader.py       load_scenario() → Scenario, get_scenario_name() → str
+    skill/body.py            SKILL_BODY string
+    skill/frontmatter.py     SKILL_FRONTMATTER string
+    golden_examples/all.py   GOLDEN_EXAMPLES list  (synthetic only)
+    data_loader.py           load(n, seed) → examples  (HF only)
 ```

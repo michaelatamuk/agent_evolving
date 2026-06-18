@@ -11,7 +11,6 @@ def load_scenario():
             skill_frontmatter=SKILL_FRONTMATTER,
             description="Python code review — bugs, style, performance, security",
             loader=lambda n, seed: GOLDEN_EXAMPLES,
-            sample_query=GOLDEN_EXAMPLES[0]["task_input"],
         )
 
 

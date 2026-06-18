@@ -11,10 +11,6 @@ def load_scenario():
             skill_frontmatter=SKILL_FRONTMATTER,
             description="HotPotQA multi-hop QA — chain-of-thought over two supporting facts (DSPy benchmark)",
             loader=load,
-            sample_query=(
-                "Who was the lead singer of the band that performed the theme song "
-                "for the 1995 James Bond film?"
-            ),
         )
 
 def get_scenario_name():

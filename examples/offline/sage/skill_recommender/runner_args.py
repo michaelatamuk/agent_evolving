@@ -15,7 +15,7 @@ def args_parser(DEFAULT_ORACLE_DIR):
 
     # ── Mode flags ────────────────────────────────────────────────────────
     mode_group = parser.add_mutually_exclusive_group()
-    _AVAILABLE = [s.name for s in list_scenarios() if s.sample_query is not None]
+    _AVAILABLE = [s.name for s in list_scenarios() if s.loader is not None]
     mode_group.add_argument("--self-test",
                             nargs="*",
                             metavar="NAME",

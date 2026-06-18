@@ -11,10 +11,6 @@ def load_scenario():
             skill_frontmatter=SKILL_FRONTMATTER,
             description="GSM8K grade-school math — step-by-step reasoning chain (OPRO, DSPy benchmark)",
             loader=load,
-            sample_query=(
-                "A baker made 48 cookies and packed them into boxes of 6. "
-                "He sold 5 boxes. How many cookies does he have left?"
-            ),
         )
 
 def get_scenario_name():

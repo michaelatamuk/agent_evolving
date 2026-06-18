@@ -28,12 +28,9 @@ class Scenario:
         One-line human-readable description shown in the runner banner.
     loader:
         Optional callable ``(n: int, seed: int) -> List[Dict]`` that fetches
-        examples from the original HuggingFace benchmark dataset.  Only present
-        for benchmark scenarios (gsm8k, hotpotqa, pubmedqa, aquarat).
+        examples.  Synthetic scenarios use ``lambda n, seed: GOLDEN_EXAMPLES``.
+        HF scenarios call the HuggingFace dataset.
         Call ``load_examples(n, seed)`` rather than invoking this directly.
-    sample_query:
-        A representative routing query for this scenario.  Used to verify that the
-        skill recommender routes correctly.
     """
 
     name: str
@@ -41,23 +38,21 @@ class Scenario:
     skill_frontmatter: str
     description: str = ""
     loader: Optional[Callable[..., List[Dict[str, Any]]]] = field(default=None, repr=False)
-    sample_query: Optional[str] = None
 
     # ── Derived helpers ────────────────────────────────────────────────────────
 
     def load_examples(self, n: int = 50, seed: int = 42) -> List[Dict[str, Any]]:
         """Return examples for this scenario.
 
-        For benchmark scenarios (gsm8k, hotpotqa, etc.) this fetches ``n``
-        examples from the HuggingFace dataset when a ``loader`` is registered.
-        Falls back to the static ``golden_examples`` list when the loader is
-        absent or raises (e.g. no network access).
+        For HF benchmark scenarios this fetches ``n`` examples from HuggingFace.
+        For synthetic scenarios the loader returns the full static list
+        (``n`` and ``seed`` are accepted but ignored).
+        Returns ``[]`` when no loader is registered (e.g. bbh).
 
         Parameters
         ----------
         n:
-            Number of examples to load from HuggingFace.  Ignored when no
-            loader is registered.
+            Number of examples to load from HuggingFace.
         seed:
             Random seed for reproducible sampling.
         """
@@ -95,10 +90,7 @@ class Scenario:
         return shuffled[:cut], shuffled[cut:]
 
     def example_counts(self, n: int = 50, seed: int = 42) -> Dict[str, int]:
-        """Return a dict mapping difficulty label → count.
-
-        Calls ``load_examples(n, seed)`` so works for both static and HF scenarios.
-        """
+        """Return a dict mapping difficulty label → count."""
         counts: Dict[str, int] = {}
         for ex in self.load_examples(n=n, seed=seed):
             d = ex.get("difficulty", "unknown")

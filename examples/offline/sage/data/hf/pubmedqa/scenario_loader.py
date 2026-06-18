@@ -11,10 +11,6 @@ def load_scenario():
             skill_frontmatter=SKILL_FRONTMATTER,
             description="PubMedQA biomedical QA — yes/no/maybe verdict with evidence (SkillGen benchmark)",
             loader=load,
-            sample_query=(
-                "Does regular physical exercise reduce the risk of type 2 diabetes "
-                "in adults with pre-diabetic conditions?"
-            ),
         )
 
 def get_scenario_name():

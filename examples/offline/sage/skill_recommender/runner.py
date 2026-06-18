@@ -19,13 +19,13 @@ Two modes selected by flags:
   SELF-TEST MODE  (--self-test [NAME ...])
   ─────────────────────────────────────────
   Builds a scoring matrix from scenario examples and shows routing accuracy.
-  Works with any scenario that has a sample_query.
+  Works with any scenario that has a loader (all except bbh).
 
       python runner.py --self-test                               # all scenarios
       python runner.py --self-test smarthub-support code-review  # synthetic only
       python runner.py --self-test gsm8k hotpotqa               # HF download
 
-  Available: any name from list_scenarios() with sample_query set.
+  Available: any name from list_scenarios() with a loader (all except bbh).
 
 Common options
 ──────────────

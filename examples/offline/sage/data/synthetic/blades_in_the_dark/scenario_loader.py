@@ -11,7 +11,6 @@ def load_scenario():
             skill_frontmatter=SKILL_FRONTMATTER,
             description="Blades in the Dark GM facilitation — D&D baseline primes systematically wrong answers for BitD mechanics",
             loader=lambda n, seed: GOLDEN_EXAMPLES,
-            sample_query=GOLDEN_EXAMPLES[0]["task_input"],
         )
 
 

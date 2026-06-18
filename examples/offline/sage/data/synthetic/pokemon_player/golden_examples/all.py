@@ -23,13 +23,13 @@
 # Expected baseline holdout score:  ~0.10–0.25
 # Expected evolved holdout score:   ~0.70–0.90
 
-from golden_examples.easy import (
+from .easy import (
     GOLDEN_EXAMPLES_EASY,
 )
-from golden_examples.medium import (
+from .medium import (
     GOLDEN_EXAMPLES_MEDIUM,
 )
-from golden_examples.hard import (
+from .hard import (
     GOLDEN_EXAMPLES_HARD,
 )
 
