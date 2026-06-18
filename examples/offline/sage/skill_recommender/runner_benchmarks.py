@@ -32,13 +32,13 @@ ALL_BENCHMARKS      = ["bbh", "gsm8k", "hotpotqa", "pubmedqa", "aquarat"]
 
 def _benchmark_loaders() -> dict:
     """Return a dict mapping benchmark name → oracle-loader callable."""
-    from ..data import build_oracle
+    from ..data import get_scenario
     return {
-        "bbh":      lambda d, n, ow: build_oracle("bbh",      d, n, ow),
-        "gsm8k":    lambda d, n, ow: build_oracle("gsm8k",    d, n, ow),
-        "hotpotqa": lambda d, n, ow: build_oracle("hotpotqa", d, n, ow),
-        "pubmedqa": lambda d, n, ow: build_oracle("pubmedqa", d, n, ow),
-        "aquarat":  lambda d, n, ow: build_oracle("aquarat",  d, n, ow),
+        "bbh":      lambda d, n, ow: get_scenario("bbh").build_oracle(d, n, ow),
+        "gsm8k":    lambda d, n, ow: get_scenario("gsm8k").build_oracle(d, n, ow),
+        "hotpotqa": lambda d, n, ow: get_scenario("hotpotqa").build_oracle(d, n, ow),
+        "pubmedqa": lambda d, n, ow: get_scenario("pubmedqa").build_oracle(d, n, ow),
+        "aquarat":  lambda d, n, ow: get_scenario("aquarat").build_oracle(d, n, ow),
     }
 
 

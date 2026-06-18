@@ -47,10 +47,17 @@ Benchmark scenarios (from skill-improvement papers)
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Optional
+from typing import Dict, List
 
 from examples.offline.sage.data import Scenario
+from examples.offline.sage.data.data_loaders.gsm8k_loader import load_gsm8k_to_oracle as _gsm8k_oracle
+from examples.offline.sage.data.data_loaders.hotpotqa_loader import load_hotpotqa_to_oracle as _hp_oracle
+from examples.offline.sage.data.data_loaders.pubmedqa_loader import load_pubmedqa_to_oracle as _pm_oracle
+from examples.offline.sage.data.data_loaders.aquarat_loader import load_aquarat_to_oracle as _aq_oracle
+from examples.offline.sage.data.data_loaders.bbh_loader import (
+    load_bbh_to_oracle as _bbh_oracle,
+    DEFAULT_TASKS as _BBH_DEFAULT_TASKS,
+)
 
 
 def _load_scenarios() -> Dict[str, Scenario]:
@@ -213,6 +220,7 @@ def _load_scenarios() -> Dict[str, Scenario]:
             golden_examples=_GS_EXAMPLES,
             description="GSM8K grade-school math — step-by-step reasoning chain (OPRO, DSPy benchmark)",
             loader=_GS_LOADER,
+            oracle_builder=lambda d, n, ow: _gsm8k_oracle(d, n_examples=n, overwrite=ow),
         ),
         "hotpotqa": Scenario(
             name="hotpotqa",
@@ -221,6 +229,7 @@ def _load_scenarios() -> Dict[str, Scenario]:
             golden_examples=_HP_EXAMPLES,
             description="HotPotQA multi-hop QA — chain-of-thought over two supporting facts (DSPy benchmark)",
             loader=_HP_LOADER,
+            oracle_builder=lambda d, n, ow: _hp_oracle(d, n_examples=n, overwrite=ow),
         ),
         "pubmedqa": Scenario(
             name="pubmedqa",
@@ -229,6 +238,7 @@ def _load_scenarios() -> Dict[str, Scenario]:
             golden_examples=_PM_EXAMPLES,
             description="PubMedQA biomedical QA — yes/no/maybe verdict with evidence (SkillGen benchmark)",
             loader=_PM_LOADER,
+            oracle_builder=lambda d, n, ow: _pm_oracle(d, n_examples=n, overwrite=ow),
         ),
         "aquarat": Scenario(
             name="aquarat",
@@ -237,6 +247,15 @@ def _load_scenarios() -> Dict[str, Scenario]:
             golden_examples=_AQ_EXAMPLES,
             description="AQuA-RAT algebra word problems — full working + correct option letter (OPRO benchmark)",
             loader=_AQ_LOADER,
+            oracle_builder=lambda d, n, ow: _aq_oracle(d, n_examples=n, overwrite=ow),
+        ),
+        "bbh": Scenario(
+            name="bbh",
+            skill_body="",
+            skill_frontmatter="",
+            golden_examples=[],
+            description="Big-Bench Hard — diverse reasoning tasks (multi-task oracle benchmark, no single skill)",
+            oracle_builder=lambda d, n, ow: _bbh_oracle(d, tasks=_BBH_DEFAULT_TASKS, n_examples=n, overwrite=ow),
         ),
     }
 

@@ -7,6 +7,7 @@ so the runner can select any pair by name.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional
 
 
@@ -34,6 +35,10 @@ class Scenario:
         examples from the original HuggingFace benchmark dataset.  Only present
         for benchmark scenarios (gsm8k, hotpotqa, pubmedqa, aquarat).
         Call ``load_examples(n, seed)`` rather than invoking this directly.
+    oracle_builder:
+        Optional callable ``(oracle_dir, n_examples, overwrite) -> Path`` that
+        writes a scoring-matrix oracle file.  Only present for benchmark scenarios.
+        Call ``build_oracle(oracle_dir, ...)`` rather than invoking this directly.
     """
 
     name: str
@@ -42,6 +47,7 @@ class Scenario:
     golden_examples: List[Dict[str, Any]]
     description: str = ""
     loader: Optional[Callable[..., List[Dict[str, Any]]]] = field(default=None, repr=False)
+    oracle_builder: Optional[Callable[..., Path]] = field(default=None, repr=False)
 
     # ── Derived helpers ────────────────────────────────────────────────────────
 
@@ -72,6 +78,24 @@ class Scenario:
                 "static examples."
             )
             return self.golden_examples
+
+    def build_oracle(
+        self,
+        oracle_dir: Path,
+        n_examples: int = 50,
+        overwrite: bool = False,
+    ) -> Path:
+        """Write a scoring-matrix oracle file for this scenario into *oracle_dir*.
+
+        Only available for benchmark scenarios (gsm8k, hotpotqa, pubmedqa,
+        aquarat, bbh).  Raises ``NotImplementedError`` for local-only scenarios.
+        """
+        if self.oracle_builder is None:
+            raise NotImplementedError(
+                f"'{self.name}' does not support build_oracle "
+                "(no oracle_builder registered for this scenario)"
+            )
+        return self.oracle_builder(oracle_dir, n_examples, overwrite)
 
     def example_counts(self) -> Dict[str, int]:
         """Return a dict mapping difficulty label → count."""
