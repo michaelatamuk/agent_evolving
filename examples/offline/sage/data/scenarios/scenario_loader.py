@@ -49,27 +49,17 @@ from __future__ import annotations
 
 from typing import Dict, List
 
+from data.scenarios.hf.aquarat.scenario_loader import load_scenario as load_scenario_aquarat
+from data.scenarios.hf.aquarat.scenario_loader import get_scenario_name as get_scenario_name_aquarat
+from data.scenarios.hf.bbh.scenario_loader import load_scenario as load_scenario_bbh
+from data.scenarios.hf.bbh.scenario_loader import get_scenario_name as get_scenario_name_bbh
+from data.scenarios.hf.pubmedqa.scenario_loader import load_scenario as load_scenario_pubmedqa
+from data.scenarios.hf.pubmedqa.scenario_loader import get_scenario_name as get_scenario_name_pubmedqa
+from data.scenarios.hf.hotpotqa.scenario_loader import load_scenario as load_scenario_hotpotqa
+from data.scenarios.hf.hotpotqa.scenario_loader import get_scenario_name as get_scenario_name_hotpotqa
+from data.scenarios.hf.gsm8k.scenario_loader import load_scenario as load_scenario_gsm8k
+from data.scenarios.hf.gsm8k.scenario_loader import get_scenario_name as get_scenario_name_gsm8k
 from examples.offline.sage.data import Scenario
-from examples.offline.sage.data.scenarios.hf.gsm8k.gsm8k_loader import (
-    load_gsm8k_to_oracle as _gsm8k_oracle,
-    SKILL_NAME as _GSIM8K_SKILL_NAME,
-)
-from examples.offline.sage.data.scenarios.hf.hotpotqa.hotpotqa_loader import (
-    load_hotpotqa_to_oracle as _hp_oracle,
-    SKILL_NAME as _HP_SKILL_NAME,
-)
-from examples.offline.sage.data.scenarios.hf.pubmedqa.pubmedqa_loader import (
-    load_pubmedqa_to_oracle as _pm_oracle,
-    SKILL_NAME as _PM_SKILL_NAME,
-)
-from examples.offline.sage.data.scenarios.hf.aquarat.aquarat_loader import (
-    load_aquarat_to_oracle as _aq_oracle,
-    SKILL_NAME as _AQ_SKILL_NAME,
-)
-from examples.offline.sage.data.scenarios.hf.bbh.bbh_loader import (
-    load_bbh_to_oracle as _bbh_oracle,
-    DEFAULT_TASKS as _BBH_DEFAULT_TASKS,
-)
 
 from examples.offline.sage.data.scenarios.synthetic.code_review.skill.body import \
     SKILL_BODY as _CR_BODY
@@ -125,30 +115,6 @@ from examples.offline.sage.data.scenarios.synthetic.smarthub_support.skill.front
     SKILL_FRONTMATTER as _SH_FM
 from examples.offline.sage.data.scenarios.synthetic.smarthub_support.golden_examples.all import \
     GOLDEN_EXAMPLES as _SH_EXAMPLES
-from examples.offline.sage.data.scenarios.hf.gsm8k.skill.body import \
-    SKILL_BODY as _GS_BODY
-from examples.offline.sage.data.scenarios.hf.gsm8k.skill.frontmatter import \
-    SKILL_FRONTMATTER as _GS_FM
-from examples.offline.sage.data.scenarios.hf.hotpotqa.skill.body import \
-    SKILL_BODY as _HP_BODY
-from examples.offline.sage.data.scenarios.hf.hotpotqa.skill.frontmatter import \
-    SKILL_FRONTMATTER as _HP_FM
-from examples.offline.sage.data.scenarios.hf.pubmedqa.skill.body import \
-    SKILL_BODY as _PM_BODY
-from examples.offline.sage.data.scenarios.hf.pubmedqa.skill.frontmatter import \
-    SKILL_FRONTMATTER as _PM_FM
-from examples.offline.sage.data.scenarios.hf.aquarat.skill.body import \
-    SKILL_BODY as _AQ_BODY
-from examples.offline.sage.data.scenarios.hf.aquarat.skill.frontmatter import \
-    SKILL_FRONTMATTER as _AQ_FM
-from examples.offline.sage.data.scenarios.hf.gsm8k.hf_loader import \
-    load as _GS_LOADER
-from examples.offline.sage.data.scenarios.hf.hotpotqa.hf_loader import \
-    load as _HP_LOADER
-from examples.offline.sage.data.scenarios.hf.pubmedqa.hf_loader import \
-    load as _PM_LOADER
-from examples.offline.sage.data.scenarios.hf.aquarat.hf_loader import \
-    load as _AQ_LOADER
 
 
 def _load_scenarios() -> Dict[str, Scenario]:
@@ -216,71 +182,9 @@ def _load_scenarios() -> Dict[str, Scenario]:
             golden_examples=_SH_EXAMPLES,
             description="SmartHub customer support — generic baseline vs product-specific knowledge (exec demo scenario)",
         ),
-        "gsm8k": Scenario(
-            name="gsm8k",
-            skill_body=_GS_BODY,
-            skill_frontmatter=_GS_FM,
-            golden_examples=[],
-            description="GSM8K grade-school math — step-by-step reasoning chain (OPRO, DSPy benchmark)",
-            loader=_GS_LOADER,
-            oracle_builder=lambda d, n, ow: _gsm8k_oracle(d, n_examples=n, overwrite=ow),
-            oracle_skill_name=_GSIM8K_SKILL_NAME,
-            sample_query=(
-                "A baker made 48 cookies and packed them into boxes of 6. "
-                "He sold 5 boxes. How many cookies does he have left?"
-            ),
-        ),
-        "hotpotqa": Scenario(
-            name="hotpotqa",
-            skill_body=_HP_BODY,
-            skill_frontmatter=_HP_FM,
-            golden_examples=[],
-            description="HotPotQA multi-hop QA — chain-of-thought over two supporting facts (DSPy benchmark)",
-            loader=_HP_LOADER,
-            oracle_builder=lambda d, n, ow: _hp_oracle(d, n_examples=n, overwrite=ow),
-            oracle_skill_name=_HP_SKILL_NAME,
-            sample_query=(
-                "Who was the lead singer of the band that performed the theme song "
-                "for the 1995 James Bond film?"
-            ),
-        ),
-        "pubmedqa": Scenario(
-            name="pubmedqa",
-            skill_body=_PM_BODY,
-            skill_frontmatter=_PM_FM,
-            golden_examples=[],
-            description="PubMedQA biomedical QA — yes/no/maybe verdict with evidence (SkillGen benchmark)",
-            loader=_PM_LOADER,
-            oracle_builder=lambda d, n, ow: _pm_oracle(d, n_examples=n, overwrite=ow),
-            oracle_skill_name=_PM_SKILL_NAME,
-            sample_query=(
-                "Does regular physical exercise reduce the risk of type 2 diabetes "
-                "in adults with pre-diabetic conditions?"
-            ),
-        ),
-        "aquarat": Scenario(
-            name="aquarat",
-            skill_body=_AQ_BODY,
-            skill_frontmatter=_AQ_FM,
-            golden_examples=[],
-            description="AQuA-RAT algebra word problems — full working + correct option letter (OPRO benchmark)",
-            loader=_AQ_LOADER,
-            oracle_builder=lambda d, n, ow: _aq_oracle(d, n_examples=n, overwrite=ow),
-            oracle_skill_name=_AQ_SKILL_NAME,
-            sample_query=(
-                "If the price of a book is increased by 20% and then decreased by 10%, "
-                "what is the net percentage change in the price? "
-                "Options:\nA) 8% increase\nB) 10% decrease\nC) 8% decrease\nD) 10% increase\nE) No change"
-            ),
-        ),
-        "bbh": Scenario(
-            name="bbh",
-            skill_body="",
-            skill_frontmatter="",
-            golden_examples=[],
-            description="Big-Bench Hard — diverse reasoning tasks (multi-task oracle benchmark, no single skill)",
-            oracle_builder=lambda d, n, ow: _bbh_oracle(d, tasks=_BBH_DEFAULT_TASKS, n_examples=n, overwrite=ow),
-            oracle_skill_name=None,  # multi-task: any loaded bbh skill counts as a hit
-            sample_query="Sort the following words in alphabetical order: zebra mango apple pineapple cherry",
-        ),
+        get_scenario_name_gsm8k(): load_scenario_gsm8k(),
+        get_scenario_name_hotpotqa(): load_scenario_hotpotqa(),
+        get_scenario_name_pubmedqa():load_scenario_pubmedqa(),
+        get_scenario_name_aquarat():load_scenario_aquarat(),
+        get_scenario_name_bbh(): load_scenario_bbh(),
     }
