@@ -7,7 +7,7 @@ from .golden_examples.all import GOLDEN_EXAMPLES
 
 def load_scenario():
     return Scenario(
-            name="ml-review",
+            name=get_scenario_name(),
             skill_body=SKILL_BODY,
             skill_frontmatter=SKILL_FRONTMATTER,
             golden_examples=GOLDEN_EXAMPLES,

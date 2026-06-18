@@ -4,7 +4,7 @@ from .bbh_loader import load_bbh_to_oracle, DEFAULT_TASKS
 
 def load_scenario():
     return Scenario(
-            name="bbh",
+            name=get_scenario_name(),
             skill_body="",
             skill_frontmatter="",
             golden_examples=[],

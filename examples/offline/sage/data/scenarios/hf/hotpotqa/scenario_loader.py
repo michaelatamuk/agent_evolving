@@ -7,7 +7,7 @@ from .hotpotqa_loader import load_hotpotqa_to_oracle, SKILL_NAME
 
 def load_scenario():
     return Scenario(
-            name="hotpotqa",
+            name=get_scenario_name(),
             skill_body=SKILL_BODY,
             skill_frontmatter=SKILL_FRONTMATTER,
             golden_examples=[],
