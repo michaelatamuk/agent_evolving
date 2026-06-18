@@ -39,6 +39,13 @@ class Scenario:
         Optional callable ``(oracle_dir, n_examples, overwrite) -> Path`` that
         writes a scoring-matrix oracle file.  Only present for benchmark scenarios.
         Call ``build_oracle(oracle_dir, ...)`` rather than invoking this directly.
+    oracle_skill_name:
+        The skill name written inside the oracle JSON (e.g. ``"math-word-problems"``
+        for gsm8k).  Used by the recommender to identify which skill a query routes
+        to.  ``None`` for bbh (multi-task) and all local-only scenarios.
+    sample_query:
+        A representative routing query for this scenario.  Used to verify that the
+        skill recommender routes correctly.  ``None`` for local-only scenarios.
     """
 
     name: str
@@ -48,6 +55,8 @@ class Scenario:
     description: str = ""
     loader: Optional[Callable[..., List[Dict[str, Any]]]] = field(default=None, repr=False)
     oracle_builder: Optional[Callable[..., Path]] = field(default=None, repr=False)
+    oracle_skill_name: Optional[str] = None
+    sample_query: Optional[str] = None
 
     # ── Derived helpers ────────────────────────────────────────────────────────
 

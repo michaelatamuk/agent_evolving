@@ -50,10 +50,22 @@ from __future__ import annotations
 from typing import Dict, List
 
 from examples.offline.sage.data import Scenario
-from examples.offline.sage.data.data_loaders.gsm8k_loader import load_gsm8k_to_oracle as _gsm8k_oracle
-from examples.offline.sage.data.data_loaders.hotpotqa_loader import load_hotpotqa_to_oracle as _hp_oracle
-from examples.offline.sage.data.data_loaders.pubmedqa_loader import load_pubmedqa_to_oracle as _pm_oracle
-from examples.offline.sage.data.data_loaders.aquarat_loader import load_aquarat_to_oracle as _aq_oracle
+from examples.offline.sage.data.data_loaders.gsm8k_loader import (
+    load_gsm8k_to_oracle as _gsm8k_oracle,
+    SKILL_NAME as _GSIM8K_SKILL_NAME,
+)
+from examples.offline.sage.data.data_loaders.hotpotqa_loader import (
+    load_hotpotqa_to_oracle as _hp_oracle,
+    SKILL_NAME as _HP_SKILL_NAME,
+)
+from examples.offline.sage.data.data_loaders.pubmedqa_loader import (
+    load_pubmedqa_to_oracle as _pm_oracle,
+    SKILL_NAME as _PM_SKILL_NAME,
+)
+from examples.offline.sage.data.data_loaders.aquarat_loader import (
+    load_aquarat_to_oracle as _aq_oracle,
+    SKILL_NAME as _AQ_SKILL_NAME,
+)
 from examples.offline.sage.data.data_loaders.bbh_loader import (
     load_bbh_to_oracle as _bbh_oracle,
     DEFAULT_TASKS as _BBH_DEFAULT_TASKS,
@@ -221,6 +233,11 @@ def _load_scenarios() -> Dict[str, Scenario]:
             description="GSM8K grade-school math — step-by-step reasoning chain (OPRO, DSPy benchmark)",
             loader=_GS_LOADER,
             oracle_builder=lambda d, n, ow: _gsm8k_oracle(d, n_examples=n, overwrite=ow),
+            oracle_skill_name=_GSIM8K_SKILL_NAME,
+            sample_query=(
+                "A baker made 48 cookies and packed them into boxes of 6. "
+                "He sold 5 boxes. How many cookies does he have left?"
+            ),
         ),
         "hotpotqa": Scenario(
             name="hotpotqa",
@@ -230,6 +247,11 @@ def _load_scenarios() -> Dict[str, Scenario]:
             description="HotPotQA multi-hop QA — chain-of-thought over two supporting facts (DSPy benchmark)",
             loader=_HP_LOADER,
             oracle_builder=lambda d, n, ow: _hp_oracle(d, n_examples=n, overwrite=ow),
+            oracle_skill_name=_HP_SKILL_NAME,
+            sample_query=(
+                "Who was the lead singer of the band that performed the theme song "
+                "for the 1995 James Bond film?"
+            ),
         ),
         "pubmedqa": Scenario(
             name="pubmedqa",
@@ -239,6 +261,11 @@ def _load_scenarios() -> Dict[str, Scenario]:
             description="PubMedQA biomedical QA — yes/no/maybe verdict with evidence (SkillGen benchmark)",
             loader=_PM_LOADER,
             oracle_builder=lambda d, n, ow: _pm_oracle(d, n_examples=n, overwrite=ow),
+            oracle_skill_name=_PM_SKILL_NAME,
+            sample_query=(
+                "Does regular physical exercise reduce the risk of type 2 diabetes "
+                "in adults with pre-diabetic conditions?"
+            ),
         ),
         "aquarat": Scenario(
             name="aquarat",
@@ -248,6 +275,12 @@ def _load_scenarios() -> Dict[str, Scenario]:
             description="AQuA-RAT algebra word problems — full working + correct option letter (OPRO benchmark)",
             loader=_AQ_LOADER,
             oracle_builder=lambda d, n, ow: _aq_oracle(d, n_examples=n, overwrite=ow),
+            oracle_skill_name=_AQ_SKILL_NAME,
+            sample_query=(
+                "If the price of a book is increased by 20% and then decreased by 10%, "
+                "what is the net percentage change in the price? "
+                "Options:\nA) 8% increase\nB) 10% decrease\nC) 8% decrease\nD) 10% increase\nE) No change"
+            ),
         ),
         "bbh": Scenario(
             name="bbh",
@@ -256,6 +289,8 @@ def _load_scenarios() -> Dict[str, Scenario]:
             golden_examples=[],
             description="Big-Bench Hard — diverse reasoning tasks (multi-task oracle benchmark, no single skill)",
             oracle_builder=lambda d, n, ow: _bbh_oracle(d, tasks=_BBH_DEFAULT_TASKS, n_examples=n, overwrite=ow),
+            oracle_skill_name=None,  # multi-task: any loaded bbh skill counts as a hit
+            sample_query="Sort the following words in alphabetical order: zebra mango apple pineapple cherry",
         ),
     }
 

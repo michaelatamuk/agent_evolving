@@ -3,7 +3,9 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from .runner_benchmarks import ALL_BENCHMARKS
+from ..data import list_scenarios as _list_scenarios
+
+_AVAILABLE_BENCHMARKS = [s.name for s in _list_scenarios() if s.oracle_builder is not None]
 
 
 # ── Constants ─────────────────────────────────────────────────────────────────
@@ -32,7 +34,7 @@ def args_parser():
                             default=None,
                             help=f"Download HuggingFace benchmarks and show routing accuracy. "
                                  f"Pass names to select a subset, or omit names for all. "
-                                 f"Available: {', '.join(ALL_BENCHMARKS)}",)
+                                 f"Available: {', '.join(_AVAILABLE_BENCHMARKS)}",)
 
     # ── Query input (query mode only) ─────────────────────────────────────
     query_group = parser.add_mutually_exclusive_group()
