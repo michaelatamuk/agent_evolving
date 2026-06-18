@@ -4,8 +4,8 @@ import argparse
 import sys
 from pathlib import Path
 
-from .recommender import build_recommender
-from .runner_printer import _print_query_results, _print_skills
+from ..recommender_builder import build_recommender
+from .results_printer import _print_query_results, _print_skills
 
 
 def _run_query(args: argparse.Namespace) -> None:
@@ -29,7 +29,7 @@ def _run_query(args: argparse.Namespace) -> None:
         )
 
     if cache_path is not None:
-        from .embedder import Embedder
+        from ..recommender_similarities_computer import Embedder
         if cache_path.exists():
             try:
                 recommender._embedder = Embedder.load(cache_path)
@@ -55,9 +55,14 @@ def _run_query(args: argparse.Namespace) -> None:
         if not queries:
             sys.exit(f"[ERROR] File is empty: {fp}")
     elif args.query is None or args.query == "-":
-        if sys.stdin.isatty():
-            print("Enter your query (press Enter then Ctrl-D to submit):")
-        raw = sys.stdin.read().strip()
+        print("Enter your query (press Enter to submit):")
+        try:
+            # Try reading a single line first (works for live keyboard & IDEs)
+            raw = sys.stdin.readline().strip()
+        except Exception:
+            # Fallback if standard input is completely redirected
+            raw = sys.stdin.read().strip()
+
         if not raw:
             sys.exit("Query is empty. Provide a prompt as argument, via --from-file, or stdin.")
         queries = [raw]

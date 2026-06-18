@@ -140,7 +140,7 @@ def _normalise_rows(df: pd.DataFrame) -> pd.DataFrame:
 
 # ── Public API ────────────────────────────────────────────────────────────────
 
-def load_matrix(
+def load_scores_matrix(
     oracle_dir: Path,
     variant: str = "baseline",
 ) -> pd.DataFrame:

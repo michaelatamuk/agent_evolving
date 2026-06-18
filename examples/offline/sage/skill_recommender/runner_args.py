@@ -5,13 +5,9 @@ from pathlib import Path
 
 from ..data import list_scenarios
 
-# ── Constants ─────────────────────────────────────────────────────────────────
-
-DEFAULT_ORACLE_DIR  = Path("~/.openjiuwen/oracle").expanduser()
-
 # ── CLI ───────────────────────────────────────────────────────────────────────
 
-def args_parser():
+def args_parser(DEFAULT_ORACLE_DIR):
     parser = argparse.ArgumentParser(prog="runner.py",
                                      description="Skill Recommender — query or self-test mode.",
                                      formatter_class=argparse.RawDescriptionHelpFormatter,

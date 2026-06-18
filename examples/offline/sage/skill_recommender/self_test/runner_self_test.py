@@ -5,20 +5,15 @@ import contextlib
 import tempfile
 from pathlib import Path
 
-from .oracle_builder import build_oracle_from_examples
-from .recommender import build_recommender
-from .runner_printer import _print_benchmark_results
-from ..data import list_scenarios
-
-
-def _self_test_scenarios():
-    """Return scenarios that have a sample_query (can be self-tested), sorted by name."""
-    return [s for s in list_scenarios() if s.sample_query is not None]
+from .self_test_oracle_builder import build_oracle_from_examples
+from .self_text_results_printer import _print_benchmark_results
+from ..recommender_builder import build_recommender
+from ...data import list_scenarios
 
 
 def _run_self_test(args: argparse.Namespace, DEFAULT_ORACLE_DIR: Path) -> None:
     """Build per-scenario oracles from load_examples(), then verify routing accuracy."""
-    scenarios       = _self_test_scenarios()
+    scenarios       = [s for s in list_scenarios() if s.sample_query is not None]
     all_names       = [s.name for s in scenarios]
     requested       = args.self_test if args.self_test else all_names
     n_examples      = args.n_examples

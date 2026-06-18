@@ -53,21 +53,20 @@ Run as module
 """
 from __future__ import annotations
 
-from examples.offline.sage.skill_recommender.runner_args import args_parser, DEFAULT_ORACLE_DIR
-from examples.offline.sage.skill_recommender.runner_self_test import _run_self_test
-from examples.offline.sage.skill_recommender.runner_query import _run_query
+from pathlib import Path
 
+from examples.offline.sage.skill_recommender.runner_args import args_parser
+from examples.offline.sage.skill_recommender.self_test.runner_self_test import _run_self_test
+from examples.offline.sage.skill_recommender.query.runner_query import _run_query
+
+DEFAULT_ORACLE_DIR  = Path("~/.openjiuwen/oracle").expanduser()
 
 # ── CLI ───────────────────────────────────────────────────────────────────────
 
-def main() -> None:
-    args = args_parser()
+if __name__ == "__main__":
+    args = args_parser(DEFAULT_ORACLE_DIR)
 
     if args.self_test is not None:
         _run_self_test(args, DEFAULT_ORACLE_DIR)
     else:
         _run_query(args)
-
-
-if __name__ == "__main__":
-    main()
