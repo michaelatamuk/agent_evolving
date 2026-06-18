@@ -144,91 +144,91 @@ class Scenario:
 
 def _load_scenarios() -> Dict[str, Scenario]:
     """Import each scenario lazily so missing dependencies don't break others."""
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.code_review.skill.body import \
+    from examples.offline.sage.data.scenarios.code_review.skill.body import \
         SKILL_BODY as _CR_BODY
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.code_review.skill.frontmatter import \
+    from examples.offline.sage.data.scenarios.code_review.skill.frontmatter import \
         SKILL_FRONTMATTER as _CR_FM
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.code_review.golden_examples.all import \
+    from examples.offline.sage.data.scenarios.code_review.golden_examples.all import \
         GOLDEN_EXAMPLES as _CR_EXAMPLES
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.api_security.skill.body import \
+    from examples.offline.sage.data.scenarios.api_security.skill.body import \
         SKILL_BODY as _AS_BODY
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.api_security.skill.frontmatter import \
+    from examples.offline.sage.data.scenarios.api_security.skill.frontmatter import \
         SKILL_FRONTMATTER as _AS_FM
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.api_security.golden_examples.all import \
+    from examples.offline.sage.data.scenarios.api_security.golden_examples.all import \
         GOLDEN_EXAMPLES as _AS_EXAMPLES
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.ml_review.skill.body import \
+    from examples.offline.sage.data.scenarios.ml_review.skill.body import \
         SKILL_BODY as _ML_BODY
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.ml_review.skill.frontmatter import \
+    from examples.offline.sage.data.scenarios.ml_review.skill.frontmatter import \
         SKILL_FRONTMATTER as _ML_FM
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.ml_review.golden_examples.all import \
+    from examples.offline.sage.data.scenarios.ml_review.golden_examples.all import \
         GOLDEN_EXAMPLES as _ML_EXAMPLES
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.rtos_review.skill.body import \
+    from examples.offline.sage.data.scenarios.rtos_review.skill.body import \
         SKILL_BODY as _RT_BODY
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.rtos_review.skill.frontmatter import \
+    from examples.offline.sage.data.scenarios.rtos_review.skill.frontmatter import \
         SKILL_FRONTMATTER as _RT_FM
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.rtos_review.golden_examples.all import \
+    from examples.offline.sage.data.scenarios.rtos_review.golden_examples.all import \
         GOLDEN_EXAMPLES as _RT_EXAMPLES
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.paper_review.skill.body import \
+    from examples.offline.sage.data.scenarios.paper_review.skill.body import \
         SKILL_BODY as _PR_BODY
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.paper_review.skill.frontmatter import \
+    from examples.offline.sage.data.scenarios.paper_review.skill.frontmatter import \
         SKILL_FRONTMATTER as _PR_FM
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.paper_review.golden_examples.all import \
+    from examples.offline.sage.data.scenarios.paper_review.golden_examples.all import \
         GOLDEN_EXAMPLES as _PR_EXAMPLES
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.contract_review.skill.body import \
+    from examples.offline.sage.data.scenarios.contract_review.skill.body import \
         SKILL_BODY as _CT_BODY
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.contract_review.skill.frontmatter import \
+    from examples.offline.sage.data.scenarios.contract_review.skill.frontmatter import \
         SKILL_FRONTMATTER as _CT_FM
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.contract_review.golden_examples.all import \
+    from examples.offline.sage.data.scenarios.contract_review.golden_examples.all import \
         GOLDEN_EXAMPLES as _CT_EXAMPLES
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.pokemon_player.skill.body import \
+    from examples.offline.sage.data.scenarios.pokemon_player.skill.body import \
         SKILL_BODY as _PK_BODY
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.pokemon_player.skill.frontmatter import \
+    from examples.offline.sage.data.scenarios.pokemon_player.skill.frontmatter import \
         SKILL_FRONTMATTER as _PK_FM
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.pokemon_player.golden_examples.all import \
+    from examples.offline.sage.data.scenarios.pokemon_player.golden_examples.all import \
         GOLDEN_EXAMPLES as _PK_EXAMPLES
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.blades_in_the_dark.skill.body import \
+    from examples.offline.sage.data.scenarios.blades_in_the_dark.skill.body import \
         SKILL_BODY as _BD_BODY
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.blades_in_the_dark.skill.frontmatter import \
+    from examples.offline.sage.data.scenarios.blades_in_the_dark.skill.frontmatter import \
         SKILL_FRONTMATTER as _BD_FM
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.blades_in_the_dark.golden_examples.all import \
+    from examples.offline.sage.data.scenarios.blades_in_the_dark.golden_examples.all import \
         GOLDEN_EXAMPLES as _BD_EXAMPLES
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.smarthub_support.skill.body import \
+    from examples.offline.sage.data.scenarios.smarthub_support.skill.body import \
         SKILL_BODY as _SH_BODY
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.smarthub_support.skill.frontmatter import \
+    from examples.offline.sage.data.scenarios.smarthub_support.skill.frontmatter import \
         SKILL_FRONTMATTER as _SH_FM
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.smarthub_support.golden_examples.all import \
+    from examples.offline.sage.data.scenarios.smarthub_support.golden_examples.all import \
         GOLDEN_EXAMPLES as _SH_EXAMPLES
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.gsm8k.skill.body import \
+    from examples.offline.sage.data.scenarios.gsm8k.skill.body import \
         SKILL_BODY as _GS_BODY
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.gsm8k.skill.frontmatter import \
+    from examples.offline.sage.data.scenarios.gsm8k.skill.frontmatter import \
         SKILL_FRONTMATTER as _GS_FM
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.gsm8k.golden_examples.all import \
+    from examples.offline.sage.data.scenarios.gsm8k.golden_examples.all import \
         GOLDEN_EXAMPLES as _GS_EXAMPLES
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.hotpotqa.skill.body import \
+    from examples.offline.sage.data.scenarios.hotpotqa.skill.body import \
         SKILL_BODY as _HP_BODY
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.hotpotqa.skill.frontmatter import \
+    from examples.offline.sage.data.scenarios.hotpotqa.skill.frontmatter import \
         SKILL_FRONTMATTER as _HP_FM
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.hotpotqa.golden_examples.all import \
+    from examples.offline.sage.data.scenarios.hotpotqa.golden_examples.all import \
         GOLDEN_EXAMPLES as _HP_EXAMPLES
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.pubmedqa.skill.body import \
+    from examples.offline.sage.data.scenarios.pubmedqa.skill.body import \
         SKILL_BODY as _PM_BODY
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.pubmedqa.skill.frontmatter import \
+    from examples.offline.sage.data.scenarios.pubmedqa.skill.frontmatter import \
         SKILL_FRONTMATTER as _PM_FM
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.pubmedqa.golden_examples.all import \
+    from examples.offline.sage.data.scenarios.pubmedqa.golden_examples.all import \
         GOLDEN_EXAMPLES as _PM_EXAMPLES
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.aquarat.skill.body import \
+    from examples.offline.sage.data.scenarios.aquarat.skill.body import \
         SKILL_BODY as _AQ_BODY
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.aquarat.skill.frontmatter import \
+    from examples.offline.sage.data.scenarios.aquarat.skill.frontmatter import \
         SKILL_FRONTMATTER as _AQ_FM
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.aquarat.golden_examples.all import \
+    from examples.offline.sage.data.scenarios.aquarat.golden_examples.all import \
         GOLDEN_EXAMPLES as _AQ_EXAMPLES
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.gsm8k.golden_examples.hf_loader import \
+    from examples.offline.sage.data.scenarios.gsm8k.golden_examples.hf_loader import \
         load as _GS_LOADER
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.hotpotqa.golden_examples.hf_loader import \
+    from examples.offline.sage.data.scenarios.hotpotqa.golden_examples.hf_loader import \
         load as _HP_LOADER
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.pubmedqa.golden_examples.hf_loader import \
+    from examples.offline.sage.data.scenarios.pubmedqa.golden_examples.hf_loader import \
         load as _PM_LOADER
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.aquarat.golden_examples.hf_loader import \
+    from examples.offline.sage.data.scenarios.aquarat.golden_examples.hf_loader import \
         load as _AQ_LOADER
 
     return {

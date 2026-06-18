@@ -33,18 +33,13 @@ ALL_BENCHMARKS      = ["bbh", "gsm8k", "hotpotqa", "pubmedqa", "aquarat"]
 
 def _benchmark_loaders() -> dict:
     """Return a dict mapping benchmark name → oracle-loader callable."""
-    from .data_loaders.bbh_loader import load_bbh_to_oracle, DEFAULT_TASKS as _BBH_DEFAULT
-    from .data_loaders.gsm8k_loader import load_gsm8k_to_oracle        # noqa: E402
-    from .data_loaders.hotpotqa_loader import load_hotpotqa_to_oracle  # noqa: E402
-    from .data_loaders.pubmedqa_loader import load_pubmedqa_to_oracle  # noqa: E402
-    from .data_loaders.aquarat_loader import load_aquarat_to_oracle    # noqa: E402
-
+    from ..data import build_oracle
     return {
-        "bbh":      lambda d, n, ow: load_bbh_to_oracle(d, tasks=_BBH_DEFAULT, n_examples=n, overwrite=ow),
-        "gsm8k":    lambda d, n, ow: load_gsm8k_to_oracle(d, n_examples=n, overwrite=ow),
-        "hotpotqa": lambda d, n, ow: load_hotpotqa_to_oracle(d, n_examples=n, overwrite=ow),
-        "pubmedqa": lambda d, n, ow: load_pubmedqa_to_oracle(d, n_examples=n, overwrite=ow),
-        "aquarat":  lambda d, n, ow: load_aquarat_to_oracle(d, n_examples=n, overwrite=ow),
+        "bbh":      lambda d, n, ow: build_oracle("bbh",      d, n, ow),
+        "gsm8k":    lambda d, n, ow: build_oracle("gsm8k",    d, n, ow),
+        "hotpotqa": lambda d, n, ow: build_oracle("hotpotqa", d, n, ow),
+        "pubmedqa": lambda d, n, ow: build_oracle("pubmedqa", d, n, ow),
+        "aquarat":  lambda d, n, ow: build_oracle("aquarat",  d, n, ow),
     }
 
 

@@ -67,7 +67,7 @@ class DemoConfig:
         ``"bag_of_words"`` (word-bag with 0.3 floor),
         ``"graph"`` (concept-graph structural similarity).
         Custom: dotted import path (e.g.
-        ``"examples.agent_evolving_hermes.offline.custom_fitness_metric_tech_keywords.tech_keyword_fitness_metric"``).
+        ``"examples.offline.sage.custom_fitness_metric_tech_keywords.tech_keyword_fitness_metric"``).
         When multiple values are given each mode runs once per metric, producing
         independent output directories (e.g. ``output_gepa_plain_holistic__jiuwen``).
     oracle_data_dir:

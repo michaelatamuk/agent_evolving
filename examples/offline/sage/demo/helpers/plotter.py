@@ -15,12 +15,12 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.helpers.stats import (
+from examples.offline.sage.demo.helpers.stats import (
     bootstrap_ci_diff,
     mean,
     std,
 )
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.trainings.results import (
+from examples.offline.sage.demo.trainings.results import (
     run_key_label,
     run_key_mode,
 )

@@ -6,7 +6,7 @@ import json
 import os
 from pathlib import Path
 
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.demo_config import (
+from examples.offline.sage.demo.demo_config import (
     ALL_MODES,
     DemoConfig,
 )

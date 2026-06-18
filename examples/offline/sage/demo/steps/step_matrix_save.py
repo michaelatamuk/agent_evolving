@@ -12,7 +12,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.analyze_scoring_matrix import (
+from examples.offline.sage.analyze_scoring_matrix import (
     analyze,
 )
 

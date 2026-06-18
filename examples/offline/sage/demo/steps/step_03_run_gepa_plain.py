@@ -1,14 +1,13 @@
 
 from __future__ import annotations
 
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.steps.steps_shared_object import \
+from examples.offline.sage.demo.steps.steps_shared_object import \
     SharedEvolutionObjects
 from agent_evolving.offline.evolvers.skill_evolver_single_params import SkillEvolverParams
 from agent_evolving.offline import EvolverConfig, evolve_single_skill
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.helpers.printer_banner import _banner
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.helpers.printer_skill import _print_skill
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.helpers.reader_latest_evolved import \
-    _read_latest_evolved
+from examples.offline.sage.demo.helpers.printer_banner import _banner
+from examples.offline.sage.demo.helpers.printer_skill import _print_skill
+from examples.offline.sage.data import read_latest_evolved
 
 
 def run_step(shared_evolution_object: SharedEvolutionObjects,
@@ -75,7 +74,7 @@ def run_step(shared_evolution_object: SharedEvolutionObjects,
     metrics_gepa_plain = evolve_single_skill(params)
 
     if verbose:
-        evolved_gepa_plain = _read_latest_evolved(output_dir, skill_name)
+        evolved_gepa_plain = read_latest_evolved(output_dir, skill_name)
         _print_skill("  Evolved skill (no TS)", evolved_gepa_plain or "[not produced]", console)
 
     console.print(f"[bold cyan]*** Demo Step 03: Run GEPA Plain Finished ***[/bold cyan]")

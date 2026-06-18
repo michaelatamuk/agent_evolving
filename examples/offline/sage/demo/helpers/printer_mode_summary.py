@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import List, Optional
 
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.helpers.stats import (
+from examples.offline.sage.demo.helpers.stats import (
     mean,
     std,
 )

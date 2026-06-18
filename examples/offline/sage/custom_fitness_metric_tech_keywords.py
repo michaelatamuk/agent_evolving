@@ -13,7 +13,7 @@ Usage in config
 ---------------
 Point ``fitness_metric`` at this function's dotted import path:
 
-    "fitness_metric": "examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.custom_fitness_metric_tech_keywords.tech_keyword_fitness_metric"
+    "fitness_metric": "examples.offline.sage.custom_fitness_metric_tech_keywords.tech_keyword_fitness_metric"
 
 Or register it under a short name:
 

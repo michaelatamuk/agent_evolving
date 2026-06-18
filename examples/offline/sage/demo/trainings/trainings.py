@@ -5,29 +5,28 @@ import time
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.demo_config import DemoConfig
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.demo_params import DemoParams
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.trainings.results import (
+from examples.offline.sage.demo.demo_config import DemoConfig
+from examples.offline.sage.demo.demo_params import DemoParams
+from examples.offline.sage.demo.trainings.results import (
     DemoTrainingsResults,
     run_key_label,
 )
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.helpers.printer_mode_summary import \
+from examples.offline.sage.demo.helpers.printer_mode_summary import \
     print_mode_summary, print_mode_timing
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.helpers.writer_skill import \
-    _write_skill
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.steps.steps_shared_object import \
+from examples.offline.sage.data import write_skill
+from examples.offline.sage.demo.steps.steps_shared_object import \
     SharedEvolutionObjects
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.steps.step_03_run_gepa_plain import \
+from examples.offline.sage.demo.steps.step_03_run_gepa_plain import \
     run_step as step_03_run_gepa_plain
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.steps.step_matrix_run_gepa import \
+from examples.offline.sage.demo.steps.step_matrix_run_gepa import \
     run_step as step_matrix_run_gepa
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.steps.step_matrix_save import \
+from examples.offline.sage.demo.steps.step_matrix_save import \
     run_step as step_matrix_save
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.steps.step_04_run_gepa_focused_on_difficulty import \
+from examples.offline.sage.demo.steps.step_04_run_gepa_focused_on_difficulty import \
     run_step as _step_focused
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.steps.step_05_run_gepa_gated import \
+from examples.offline.sage.demo.steps.step_05_run_gepa_gated import \
     run_step as _step_gated
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.steps.step_06_run_gepa_full import \
+from examples.offline.sage.demo.steps.step_06_run_gepa_full import \
     run_step as _step_full
 
 
@@ -348,7 +347,7 @@ class DemoTrainings:
 
     @staticmethod
     def _step_restore_baseline_skill(params: DemoParams) -> None:
-        _write_skill(params.skills_root, params.skill_name, params.skill_frontmatter, params.skill_body)
+        write_skill(params.skills_root, params.skill_name, params.skill_frontmatter, params.skill_body)
 
     def _out(self, params: DemoParams, base: str, i: int) -> Path:
         """Return run-specific output dir; use canonical path for n_runs==1."""

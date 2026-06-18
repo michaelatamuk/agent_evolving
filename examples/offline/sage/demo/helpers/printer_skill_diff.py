@@ -4,7 +4,7 @@ import difflib
 import shutil
 from typing import Optional
 
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.helpers.printer_banner import _banner
+from examples.offline.sage.demo.helpers.printer_banner import _banner
 
 _NUM_W  = 4   # " 12 " — line-number field width (handles up to line 999)
 _MARK_W = 2   # "< " / "> " / "  " — diff-marker field width

@@ -75,17 +75,17 @@ Uses DeepSeek-Chat (https://api.deepseek.com) by default.  Set your key in
 
 Usage
 -----
-    python -m examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.runner
+    python -m examples.offline.sage.runner
 """
 from __future__ import annotations
 
 import tempfile
 from pathlib import Path
 
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.config_loader import load_config
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.demo import Demo
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.demo_params import DemoParams
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios import (
+from examples.offline.sage.config_loader import load_config
+from examples.offline.sage.demo.demo import Demo
+from examples.offline.sage.demo.demo_params import DemoParams
+from examples.offline.sage.data import (
     Scenario, get_scenario, list_scenarios,
 )
 

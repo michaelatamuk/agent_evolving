@@ -3,4 +3,5 @@
   <component name="Black">
     <option name="sdkName" value="uv (backend)" />
   </component>
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.12 (agent_evolving)" project-jdk-type="Python SDK" />
 </project>

@@ -28,9 +28,9 @@ import uuid
 from pathlib import Path
 from typing import List, Optional
 
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.steps.steps_shared_object import \
+from examples.offline.sage.demo.steps.steps_shared_object import \
     SharedEvolutionObjects
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.steps.step_03_run_gepa_plain import \
+from examples.offline.sage.demo.steps.step_03_run_gepa_plain import \
     run_step as step_03_run_step
 from agent_evolving.offline.evolvers.skill_evolver_stages.stage05_gepa_optimizer._fitness_metrics.fitness_metric_resolver import \
     resolve_fitness_metric

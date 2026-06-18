@@ -32,7 +32,7 @@ def run_step(baseline_score_holistic: float,
         return
 
     # ── ASCII charts (terminal) ───────────────────────────────────────────
-    from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.helpers.ascii_plotter import (
+    from examples.offline.sage.demo.helpers.ascii_plotter import (
         print_ascii_charts,
     )
     print_ascii_charts(
@@ -45,7 +45,7 @@ def run_step(baseline_score_holistic: float,
 
     # ── Matplotlib PNG (file) ─────────────────────────────────────────────
     try:
-        from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.helpers.plotter import (
+        from examples.offline.sage.demo.helpers.plotter import (
             plot_results,
         )
         path = plot_results(

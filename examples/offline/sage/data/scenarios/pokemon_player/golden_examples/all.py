@@ -23,13 +23,13 @@
 # Expected baseline holdout score:  ~0.10–0.25
 # Expected evolved holdout score:   ~0.70–0.90
 
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.pokemon_player.golden_examples.easy import (
+from examples.offline.sage.data.scenarios.pokemon_player.golden_examples.easy import (
     GOLDEN_EXAMPLES_EASY,
 )
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.pokemon_player.golden_examples.medium import (
+from examples.offline.sage.data.scenarios.pokemon_player.golden_examples.medium import (
     GOLDEN_EXAMPLES_MEDIUM,
 )
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.scenarios.pokemon_player.golden_examples.hard import (
+from examples.offline.sage.data.scenarios.pokemon_player.golden_examples.hard import (
     GOLDEN_EXAMPLES_HARD,
 )
 

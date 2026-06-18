@@ -5,9 +5,9 @@ from __future__ import annotations
 from pathlib import Path
 from typing import List, Optional
 
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.steps.steps_shared_object import \
+from examples.offline.sage.demo.steps.steps_shared_object import \
     SharedEvolutionObjects
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.helpers.printer_banner import _banner
+from examples.offline.sage.demo.helpers.printer_banner import _banner
 from agent_evolving.offline import EvolverConfig
 from agent_evolving.offline.evolvers.skill_evolver_stages.stage06_holdout_evaluator.holdout_evaluator import evaluate_baseline_on_holdout
 

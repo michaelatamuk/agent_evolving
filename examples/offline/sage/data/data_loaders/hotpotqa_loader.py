@@ -45,7 +45,7 @@ import json
 import re
 from pathlib import Path
 
-from .._scoring import FITNESS_METRICS, compute_scores
+from examples.offline.sage.data._scoring import FITNESS_METRICS, compute_scores
 
 SKILL_NAME = "multi-hop-qa"
 

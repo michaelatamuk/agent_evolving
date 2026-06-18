@@ -1,31 +1,30 @@
 from __future__ import annotations
 
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.steps.steps_shared_object import \
+from examples.offline.sage.demo.steps.steps_shared_object import \
     SharedEvolutionObjects
 from agent_evolving.offline.evolvers._console_maker import _make_console
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.demo_config import DemoConfig
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.demo_params import DemoParams
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.trainings.trainings import DemoTrainings
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.trainings.results import (
+from examples.offline.sage.demo.demo_config import DemoConfig
+from examples.offline.sage.demo.demo_params import DemoParams
+from examples.offline.sage.demo.trainings.trainings import DemoTrainings
+from examples.offline.sage.demo.trainings.results import (
     DemoTrainingsResults,
     run_key_label,
 )
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.steps.step_00_write_demo_scenario_files import \
+from examples.offline.sage.demo.steps.step_00_write_demo_scenario_files import \
     run_step as step_00_write_demo_scenario_files
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.steps.step_01_build_skill_dataset_and_dspy import \
+from examples.offline.sage.demo.steps.step_01_build_skill_dataset_and_dspy import \
     run_step as step_01_build_skill_dataset_and_dspy
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.steps.step_02_evaluate_baseline import \
+from examples.offline.sage.demo.steps.step_02_evaluate_baseline import \
     run_step as step_02_evaluate_baseline
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.steps.step_07_results_comparison import \
+from examples.offline.sage.demo.steps.step_07_results_comparison import \
     run_step as step_07_results_comparison
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.steps.step_08_plot_results import \
+from examples.offline.sage.demo.steps.step_08_plot_results import \
     run_step as step_08_plot_results
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.steps.step_09_final_prints import \
+from examples.offline.sage.demo.steps.step_09_final_prints import \
     run_step as step_09_final_prints
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.helpers.printer_skill_diff import \
+from examples.offline.sage.demo.helpers.printer_skill_diff import \
     print_skill_diff
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.helpers.reader_latest_evolved import \
-    _read_latest_evolved
+from examples.offline.sage.data import read_latest_evolved
 
 
 class Demo:
@@ -164,7 +163,7 @@ class Demo:
         baseline_path = params.skills_root / params.skill_name / "SKILL.md"
         if not baseline_path.exists():
             return
-        winner_text = _read_latest_evolved(label_to_dir[winner_label], params.skill_name)
+        winner_text = read_latest_evolved(label_to_dir[winner_label], params.skill_name)
         if not winner_text:
             return
 

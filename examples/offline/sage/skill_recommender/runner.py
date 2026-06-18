@@ -68,14 +68,11 @@ import sys
 import tempfile
 from pathlib import Path
 
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.skill_recommender.runner_args import \
-    args_parser
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.skill_recommender.runner_benchmarks import \
-    _run_benchmarks
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.skill_recommender.runner_demo import \
-    _run_demo
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.skill_recommender.runner_query import \
-    _run_query
+from examples.offline.sage.skill_recommender.runner_args import args_parser
+from examples.offline.sage.skill_recommender.runner_benchmarks import _run_benchmarks
+from examples.offline.sage.skill_recommender.runner_demo import _run_demo
+from examples.offline.sage.skill_recommender.runner_query import _run_query
+
 
 # ── CLI ───────────────────────────────────────────────────────────────────────
 

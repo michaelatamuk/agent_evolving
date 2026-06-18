@@ -28,8 +28,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.helpers.printer_banner import _banner
-from examples.agent_evolving_hermes.offline.offline_05_thompson_vs_baseline.demo.steps.steps_shared_object import \
+from examples.offline.sage.demo.helpers.printer_banner import _banner
+from examples.offline.sage.demo.steps.steps_shared_object import \
     SharedEvolutionObjects
 from agent_evolving.offline import EvolverConfig
 from agent_evolving.offline.evolvers.skill_evolver_stages.stage01_skill_finder_and_loader.skill_finder_and_loader import (
