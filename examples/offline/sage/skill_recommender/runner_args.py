@@ -3,16 +3,11 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from ..data import list_scenarios as _list_scenarios
-
-_AVAILABLE_BENCHMARKS = [s.name for s in _list_scenarios() if s.oracle_builder is not None]
-
+from ..data import list_scenarios
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 
 DEFAULT_ORACLE_DIR  = Path("~/.openjiuwen/oracle").expanduser()
-
-
 
 # ── CLI ───────────────────────────────────────────────────────────────────────
 
@@ -28,6 +23,8 @@ def args_parser():
                             action="store_true",
                             default=False,
                             help="Run the synthetic quick-start demo (no network required).")
+
+    _AVAILABLE_BENCHMARKS = [s.name for s in list_scenarios() if s.oracle_builder is not None]
     mode_group.add_argument("--benchmarks",
                             nargs="*",
                             metavar="NAME",

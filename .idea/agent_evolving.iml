@@ -3,7 +3,6 @@
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/examples/offline/sage" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/examples/offline/sage/data/scenarios/hf" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/examples/offline/sage/data/scenarios/hf/aquarat" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/examples/offline/sage/data/scenarios/hf/gsm8k" isTestSource="false" />

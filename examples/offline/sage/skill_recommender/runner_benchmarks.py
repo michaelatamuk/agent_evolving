@@ -7,11 +7,11 @@ from pathlib import Path
 
 from .recommender import build_recommender
 from .runner_printer import _print_benchmark_results
+from ..data import list_scenarios
 
 
 def _benchmark_scenarios():
     """Return all scenarios that support oracle building, sorted by name."""
-    from ..data import list_scenarios
     return [s for s in list_scenarios() if s.oracle_builder is not None]
 
 

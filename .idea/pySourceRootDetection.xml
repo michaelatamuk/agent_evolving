@@ -4,6 +4,7 @@
     <option name="sourcePathsSet">
       <set>
         <option value="$PROJECT_DIR$/examples/offline/sage/data" />
+        <option value="$PROJECT_DIR$/examples/offline/sage" />
       </set>
     </option>
   </component>
