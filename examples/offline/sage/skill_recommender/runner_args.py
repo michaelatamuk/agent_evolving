@@ -13,20 +13,20 @@ DEFAULT_ORACLE_DIR  = Path("~/.openjiuwen/oracle").expanduser()
 
 def args_parser():
     parser = argparse.ArgumentParser(prog="runner.py",
-                                     description="Skill Recommender — query or benchmark mode.",
+                                     description="Skill Recommender — query or self-test mode.",
                                      formatter_class=argparse.RawDescriptionHelpFormatter,
                                      epilog=__doc__,)
 
     # ── Mode flags ────────────────────────────────────────────────────────
     mode_group = parser.add_mutually_exclusive_group()
-    _AVAILABLE_BENCHMARKS = [s.name for s in list_scenarios() if s.oracle_builder is not None]
-    mode_group.add_argument("--benchmarks",
+    _AVAILABLE = [s.name for s in list_scenarios() if s.sample_query is not None]
+    mode_group.add_argument("--self-test",
                             nargs="*",
                             metavar="NAME",
                             default=None,
-                            help=f"Download HuggingFace benchmarks and show routing accuracy. "
+                            help=f"Build oracles from scenario examples and show routing accuracy. "
                                  f"Pass names to select a subset, or omit names for all. "
-                                 f"Available: {', '.join(_AVAILABLE_BENCHMARKS)}",)
+                                 f"Available: {', '.join(_AVAILABLE)}",)
 
     # ── Query input (query mode only) ─────────────────────────────────────
     query_group = parser.add_mutually_exclusive_group()
@@ -67,17 +67,17 @@ def args_parser():
                         type=float,
                         default=None,
                         metavar="FLOAT",
-                        help="Min cosine similarity  [default: 0.25 for query, 0.08 for benchmarks]",)
+                        help="Min cosine similarity  [default: 0.25 for query, 0.08 for self-test]",)
     parser.add_argument("--score-threshold",
                         type=float,
                         default=None,
                         metavar="FLOAT",
-                        help="Min weighted score  [default: 0.20 for query, 0.08 for benchmarks]",)
+                        help="Min weighted score  [default: 0.20 for query, 0.08 for self-test]",)
     parser.add_argument("--top-k",
                         type=int,
                         default=None,
                         metavar="N",
-                        help="Max results per query  [default: 10 for query, 3 for benchmarks]",)
+                        help="Max results per query  [default: 10 for query, 3 for self-test]",)
 
     # ── Query-only settings ───────────────────────────────────────────────
     parser.add_argument("--min-examples",
@@ -91,20 +91,20 @@ def args_parser():
                         default=None,
                         help="Cache fitted embedder path (query mode).")
 
-    # ── Benchmark-only settings ───────────────────────────────────────────
+    # ── Self-test-only settings ───────────────────────────────────────────
     parser.add_argument("--n-examples",
                         type=int,
                         default=30,
                         metavar="N",
-                        help="Examples per benchmark to download  [default: 30]",)
+                        help="Examples per scenario to load  [default: 30]",)
     parser.add_argument("--overwrite",
                         action="store_true",
-                        help="Re-download even if JSON files already exist (benchmark mode).",)
+                        help="Re-build even if JSON files already exist (self-test mode).",)
 
     args = parser.parse_args()
 
     # Apply mode-specific defaults for thresholds / top-k
-    if args.benchmarks is not None:
+    if args.self_test is not None:
         args.sim_threshold   = args.sim_threshold   or 0.08
         args.score_threshold = args.score_threshold or 0.08
         args.top_k           = args.top_k           or 3

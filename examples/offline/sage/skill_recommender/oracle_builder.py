@@ -1,10 +1,13 @@
 # coding: utf-8
-"""Shared oracle builder for synthetic scenarios.
+"""Generic oracle builder for the skill_recommender self-test.
 
-Writes a scoring_matrix_<skill_name>.json from a static list of golden examples,
-in the same format as the HF benchmark loaders.  The baseline candidate output
-is always an empty string (scores 0.0) — the file is used only so the
-skill_recommender can index the scenario's example inputs.
+Converts any list of GEPA-format examples (task_input / expected_behavior)
+into a scoring_matrix_<skill_name>.json file that the Recommender can load.
+
+The baseline candidate output is always empty string — scores are 0.0 across
+all metrics.  This is intentional: the self-test checks *routing accuracy*
+(TF-IDF similarity of the query to example_input text), not fitness scores.
+Fitness scores only matter in query mode where real GEPA outputs are present.
 """
 from __future__ import annotations
 
@@ -22,13 +25,15 @@ def build_oracle_from_examples(
     examples: List[Dict[str, Any]],
     overwrite: bool = False,
 ) -> Path:
-    """Write a scoring-matrix oracle for a synthetic scenario.
+    """Write a scoring-matrix oracle JSON for one skill.
 
     Parameters
     ----------
     oracle_dir : Path   Destination directory (created if absent).
-    skill_name : str    Skill name key used by the recommender.
-    examples   : list   Golden examples with ``task_input`` and ``expected_behavior``.
+    skill_name : str    Skill name used as the key in the recommender
+                        (typically ``scenario.name``).
+    examples   : list   GEPA-format dicts with ``task_input`` and
+                        ``expected_behavior`` keys.
     overwrite  : bool   Replace existing file if True (default False).
 
     Returns
@@ -42,7 +47,7 @@ def build_oracle_from_examples(
     dest = oracle_dir / f"scoring_matrix_{safe_name}.json"
 
     if dest.exists() and not overwrite:
-        print(f"  skip  {skill_name}  (file exists, use overwrite=True to replace)")
+        print(f"  skip  {skill_name}  (file exists, use --overwrite to replace)")
         return dest
 
     print(f"  build {skill_name} …", end=" ", flush=True)
@@ -50,7 +55,7 @@ def build_oracle_from_examples(
     for i, ex in enumerate(examples):
         task_input = ex.get("task_input", "")
         expected   = ex.get("expected_behavior", "")
-        output     = ""  # deterministic baseline: empty response
+        output     = ""  # deterministic empty baseline — scores are 0.0
         cross_eval.append({
             "example_id":       f"{safe_name}_{i:04d}",
             "example_input":    task_input,
@@ -60,7 +65,7 @@ def build_oracle_from_examples(
         })
 
     payload = {
-        "run_id":              f"{safe_name}_golden",
+        "run_id":              f"{safe_name}_self_test",
         "skill_name":          skill_name,
         "fitness_metrics":     FITNESS_METRICS,
         "baseline_cross_eval": cross_eval,

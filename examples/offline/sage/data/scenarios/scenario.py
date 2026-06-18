@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import random as _random
 from dataclasses import dataclass, field
-from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 
@@ -36,17 +35,9 @@ class Scenario:
         examples from the original HuggingFace benchmark dataset.  Only present
         for benchmark scenarios (gsm8k, hotpotqa, pubmedqa, aquarat).
         Call ``load_examples(n, seed)`` rather than invoking this directly.
-    oracle_builder:
-        Optional callable ``(oracle_dir, n_examples, overwrite) -> Path`` that
-        writes a scoring-matrix oracle file.  Only present for benchmark scenarios.
-        Call ``build_oracle(oracle_dir, ...)`` rather than invoking this directly.
-    oracle_skill_name:
-        The skill name written inside the oracle JSON (e.g. ``"math-word-problems"``
-        for gsm8k).  Used by the recommender to identify which skill a query routes
-        to.  ``None`` for bbh (multi-task) and all local-only scenarios.
     sample_query:
         A representative routing query for this scenario.  Used to verify that the
-        skill recommender routes correctly.  ``None`` for local-only scenarios.
+        skill recommender routes correctly.
     """
 
     name: str
@@ -55,8 +46,6 @@ class Scenario:
     description: str = ""
     golden_examples: List[Dict[str, Any]] = field(default_factory=list)
     loader: Optional[Callable[..., List[Dict[str, Any]]]] = field(default=None, repr=False)
-    oracle_builder: Optional[Callable[..., Path]] = field(default=None, repr=False)
-    oracle_skill_name: Optional[str] = None
     sample_query: Optional[str] = None
 
     # ── Derived helpers ────────────────────────────────────────────────────────
@@ -88,24 +77,6 @@ class Scenario:
                 "static examples."
             )
             return self.golden_examples
-
-    def build_oracle(
-        self,
-        oracle_dir: Path,
-        n_examples: int = 50,
-        overwrite: bool = False,
-    ) -> Path:
-        """Write a scoring-matrix oracle file for this scenario into *oracle_dir*.
-
-        Only available for benchmark scenarios (gsm8k, hotpotqa, pubmedqa,
-        aquarat, bbh).  Raises ``NotImplementedError`` for local-only scenarios.
-        """
-        if self.oracle_builder is None:
-            raise NotImplementedError(
-                f"'{self.name}' does not support build_oracle "
-                "(no oracle_builder registered for this scenario)"
-            )
-        return self.oracle_builder(oracle_dir, n_examples, overwrite)
 
     def split(
         self,

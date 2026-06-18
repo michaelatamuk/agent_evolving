@@ -16,18 +16,16 @@ Two modes selected by flags:
       python runner.py --list-skills
       python runner.py "some prompt" --cache-embedder /tmp/emb.pkl
 
-  BENCHMARK MODE  (--benchmarks [NAME ...])
-  ──────────────────────────────────────────
+  SELF-TEST MODE  (--self-test [NAME ...])
+  ─────────────────────────────────────────
   Builds a scoring matrix from scenario examples and shows routing accuracy.
-  Works with any scenario that has an oracle_builder — both synthetic (no
-  network) and HuggingFace benchmarks.
+  Works with any scenario that has a sample_query.
 
-      python runner.py --benchmarks                          # all scenarios
-      python runner.py --benchmarks smarthub-support code-review  # no network
-      python runner.py --benchmarks gsm8k hotpotqa          # HF download
-      python runner.py --benchmarks bbh --oracle-dir /tmp/bbh_oracle
+      python runner.py --self-test                               # all scenarios
+      python runner.py --self-test smarthub-support code-review  # synthetic only
+      python runner.py --self-test gsm8k hotpotqa               # HF download
 
-  Available: any name from list_scenarios() with oracle_builder set.
+  Available: any name from list_scenarios() with sample_query set.
 
 Common options
 ──────────────
@@ -35,14 +33,14 @@ Common options
   --oracle-dir PATH      Alias for --data-dir (accepted in all modes)
   --variant              baseline | evolved | both  [default: baseline]
   --embedder             tfidf | openai  [default: tfidf]
-  --sim-threshold FLOAT  [default: 0.25 / 0.08 in benchmark mode]
-  --score-threshold FLOAT[default: 0.20 / 0.08 in benchmark mode]
-  --top-k N              [default: 10 / 3 in benchmark mode]
+  --sim-threshold FLOAT  [default: 0.25 / 0.08 in self-test mode]
+  --score-threshold FLOAT[default: 0.20 / 0.08 in self-test mode]
+  --top-k N              [default: 10 / 3 in self-test mode]
 
-Benchmark-only options
+Self-test-only options
 ──────────────────────
-  --n-examples N         Examples per benchmark to download  [default: 30]
-  --overwrite            Re-download even if JSON files already exist
+  --n-examples N         Examples per scenario to load  [default: 30]
+  --overwrite            Re-build even if JSON files already exist
 
 Query-only options
 ──────────────────
@@ -56,7 +54,7 @@ Run as module
 from __future__ import annotations
 
 from examples.offline.sage.skill_recommender.runner_args import args_parser, DEFAULT_ORACLE_DIR
-from examples.offline.sage.skill_recommender.runner_benchmarks import _run_benchmarks
+from examples.offline.sage.skill_recommender.runner_self_test import _run_self_test
 from examples.offline.sage.skill_recommender.runner_query import _run_query
 
 
@@ -65,8 +63,8 @@ from examples.offline.sage.skill_recommender.runner_query import _run_query
 def main() -> None:
     args = args_parser()
 
-    if args.benchmarks is not None:
-        _run_benchmarks(args, DEFAULT_ORACLE_DIR)
+    if args.self_test is not None:
+        _run_self_test(args, DEFAULT_ORACLE_DIR)
     else:
         _run_query(args)
 
