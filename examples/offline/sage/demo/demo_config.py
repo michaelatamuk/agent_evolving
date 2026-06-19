@@ -77,6 +77,13 @@ class DemoConfig:
         a single oracle training table.  Supports ``~`` expansion.
         ``None`` (default) disables the copy — matrices are only saved in the
         per-run temp workdir.
+    ts_router_state_dir:
+        Persistent directory where the Contextual Bayesian Router's
+        ``ts_skill_scheduler.json`` is written after every training pass.
+        The skill recommender reads this file (via ``--ts-state-path``) to
+        blend Bayesian confidence and freshness into routing scores (Phases 1/2).
+        Supports ``~`` expansion.  ``None`` (default) disables persistent
+        recording — Thompson arm state only lives in the per-run temp workdir.
     """
 
     scenario_names: List[str]
@@ -91,3 +98,4 @@ class DemoConfig:
     print_skill_diff: bool = False
     fitness_metrics: List[str] = field(default_factory=lambda: ["bag_of_words"])
     oracle_data_dir: Optional[str] = None
+    ts_router_state_dir: Optional[str] = None

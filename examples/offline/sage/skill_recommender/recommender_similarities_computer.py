@@ -125,6 +125,35 @@ class Embedder:
         q_vec = self._embed_openai([query])[0]  # shape (dim,)
         return (self._corpus_vecs @ q_vec).astype(float)
 
+    # ── Dense embedding (Phase 3) ─────────────────────────────────────────────
+
+    def dense_embed(self, query: str) -> np.ndarray:
+        """Return a **dense** 1-D embedding vector for a single *query* string.
+
+        Unlike ``similarities()``, this returns the raw embedding so callers
+        can store it, compute custom similarities, or update running averages.
+
+        For the ``"tfidf"`` backend the sparse TF-IDF vector is converted to a
+        dense float32 array (length = max_features = 10 000).
+        For the ``"openai"`` backend the L2-normalised embedding is returned
+        as-is (length = 1 536 for text-embedding-3-small).
+
+        The returned array is always L2-normalised so cosine similarity can be
+        computed as a plain dot product.
+        """
+        if not self._fitted:
+            raise RuntimeError("Call fit() before dense_embed().")
+
+        if self._method == "tfidf":
+            vec = self._vectorizer.transform([query])
+            dense = np.asarray(vec.todense(), dtype=np.float32).flatten()
+            norm = np.linalg.norm(dense)
+            if norm > 0:
+                dense = dense / norm
+            return dense
+        else:
+            return self._embed_openai([query])[0].astype(np.float32)
+
     # ── Persistence ───────────────────────────────────────────────────────────
 
     def save(self, path) -> None:

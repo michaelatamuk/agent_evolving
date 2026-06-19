@@ -5,6 +5,13 @@ from pathlib import Path
 
 from ..data import list_scenarios
 
+# ── Persistent-state defaults (must match demo/config.json paths) ─────────────
+# All three paths are safe defaults even when the files/dirs don't exist yet:
+# the recommender activates each phase only if the corresponding file is present.
+_DEFAULT_TS_STATE_PATH    = Path("~/.openjiuwen/ts_router_state/ts_skill_scheduler.json")
+_DEFAULT_CONTEXT_DIR      = Path("~/.openjiuwen/context_state")
+_DEFAULT_FRESHNESS_LAMBDA = 0.05   # exp decay per day; ~14-day half-life
+
 # ── CLI ───────────────────────────────────────────────────────────────────────
 
 def args_parser(DEFAULT_ORACLE_DIR):
@@ -96,6 +103,30 @@ def args_parser(DEFAULT_ORACLE_DIR):
     parser.add_argument("--overwrite",
                         action="store_true",
                         help="Re-build even if JSON files already exist (self-test mode).",)
+
+    # ── Contextual Bayesian Router (Phase 1 / 2 / 3) ─────────────────────
+    parser.add_argument("--ts-state-path",
+                        metavar="PATH",
+                        type=Path,
+                        default=_DEFAULT_TS_STATE_PATH,
+                        help="Path to ts_skill_scheduler.json produced by the demo or offline runner. "
+                             "Enables Phase 1 (Bayesian confidence) and Phase 2 (freshness) blending "
+                             "when the file exists; silently ignored otherwise.  "
+                             f"[default: {_DEFAULT_TS_STATE_PATH}]",)
+    parser.add_argument("--freshness-lambda",
+                        type=float,
+                        default=_DEFAULT_FRESHNESS_LAMBDA,
+                        metavar="FLOAT",
+                        help="Freshness decay rate λ per day (Phase 2). "
+                             "0 = disabled.  "
+                             f"[default: {_DEFAULT_FRESHNESS_LAMBDA} — ~14-day half-life]",)
+    parser.add_argument("--context-state-dir",
+                        metavar="PATH",
+                        type=Path,
+                        default=_DEFAULT_CONTEXT_DIR,
+                        help="Directory for context_store.json and contextual_matrix.json (Phase 3). "
+                             "Created automatically on first query; starts empty if it does not exist.  "
+                             f"[default: {_DEFAULT_CONTEXT_DIR}]",)
 
     args = parser.parse_args()
 

@@ -5,6 +5,7 @@ import time
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
+from agent_evolving.offline.evolvers.batch_selection.skills_schedulers.thompson import ThompsonSkillScheduler
 from examples.offline.sage.demo.demo_config import DemoConfig
 from examples.offline.sage.demo.demo_params import DemoParams
 from examples.offline.sage.demo.io.writer_skill import write_skill
@@ -33,6 +34,14 @@ from examples.offline.sage.demo.steps.step_06_run_gepa_full import \
 class DemoTrainings:
     def __init__(self, config: DemoConfig):
         self._config: DemoConfig = config
+        self._persistent_scheduler: Optional[ThompsonSkillScheduler] = None
+        if config.ts_router_state_dir:
+            state_dir = Path(config.ts_router_state_dir).expanduser()
+            state_dir.mkdir(parents=True, exist_ok=True)
+            self._persistent_scheduler = ThompsonSkillScheduler(
+                skills_root=state_dir,   # reuse state_dir; no metrics.json there, bootstrap is a no-op
+                state_dir=state_dir,
+            )
 
     def run(
             self,
@@ -111,6 +120,7 @@ class DemoTrainings:
                         oracle_data_dir=getattr(self._config, "oracle_data_dir", None),
                     )
 
+                    self._record_to_persistent_scheduler(params.skill_name, _m)
                     _mode_scores.append(_m.get("evolved_score", 0.0))
                     _last_metrics = _m
                     _last_out = _out_dir
@@ -204,6 +214,7 @@ class DemoTrainings:
                 run_index=i,
                 console=console,
             )
+            self._record_to_persistent_scheduler(params.skill_name, m)
             mode_scores.append(m.get("evolved_score", 0.0))
             last_metrics = m
             last_out = output_dir
@@ -342,6 +353,24 @@ class DemoTrainings:
 
         console.print(f"[yellow]Unknown mode '{mode}' — skipping[/yellow]")
         return {}
+
+    # ── Persistent TS router recording ────────────────────────────────────
+
+    def _record_to_persistent_scheduler(self, skill_name: str, m: dict) -> None:
+        """Record one training-pass result into the persistent ThompsonSkillScheduler.
+
+        Converts the improvement delta into a [0, 1] reward centred at 0.5:
+            reward = clamp(improvement + 0.5, 0.0, 1.0)
+        This means:
+            improvement =  0.0  →  reward = 0.5  (neutral)
+            improvement = +0.5  →  reward = 1.0  (strong)
+            improvement = -0.5  →  reward = 0.0  (failure)
+        """
+        if self._persistent_scheduler is None:
+            return
+        improvement = float(m.get("improvement", 0.0))
+        reward = max(0.0, min(1.0, improvement + 0.5))
+        self._persistent_scheduler.record_soft(skill_name, reward)
 
     # ── Helpers ───────────────────────────────────────────────────────────
 
