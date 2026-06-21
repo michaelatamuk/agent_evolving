@@ -31,6 +31,12 @@ class Scenario:
         examples.  Synthetic scenarios use ``lambda n, seed: GOLDEN_EXAMPLES``.
         HF scenarios call the HuggingFace dataset.
         Call ``load_examples(n, seed)`` rather than invoking this directly.
+    oracle_skill_name:
+        Optional identifier used when the scenario has a pre-built oracle skill
+        (e.g. a BBH task name).  ``None`` for most scenarios.
+    sample_query:
+        Optional representative query string shown in the tester banner.
+        ``None`` when not provided.
     """
 
     name: str
@@ -38,6 +44,8 @@ class Scenario:
     skill_frontmatter: str
     description: str = ""
     loader: Optional[Callable[..., List[Dict[str, Any]]]] = field(default=None, repr=False)
+    oracle_skill_name: Optional[str] = field(default=None)
+    sample_query: Optional[str] = field(default=None)
 
     # ── Derived helpers ────────────────────────────────────────────────────────
 

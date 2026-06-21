@@ -13,7 +13,7 @@ TRUNCATE   : max chars per field before truncating (None = no truncation)
 
 # ── CONFIG ─────────────────────────────────────────────────────────────────────
 
-SCENARIO           = "hotpotqa"   # ← change this
+SCENARIO           = "gaia"   # ← change this
 N_EXAMPLES         = 10000
 SEED               = 42
 SHOW_SKILL         = True

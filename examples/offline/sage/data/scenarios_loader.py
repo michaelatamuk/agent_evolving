@@ -44,6 +44,10 @@ Benchmark scenarios (from skill-improvement papers)
                         ★ Low baseline: ~0.10-0.25  (SkillGen arXiv:2605.10999)
     aquarat           — Algebra word problems with full working + lettered option selection
                         ★ Low baseline: ~0.05-0.15  (OPRO arXiv:2309.03409)
+    gaia              — Real-world QA requiring multi-step reasoning to exact short answer
+                        ★ Low baseline: ~0.10-0.25  (text-only subset; gated HF dataset —
+                          accept terms at huggingface.co/datasets/gaia-benchmark/GAIA and
+                          run ``huggingface-cli login`` before first use)
 """
 from __future__ import annotations
 
@@ -59,6 +63,8 @@ from .hf.hotpotqa import load_scenario as load_scenario_hotpotqa
 from .hf.hotpotqa import get_scenario_name as get_scenario_name_hotpotqa
 from .hf.gsm8k import load_scenario as load_scenario_gsm8k
 from .hf.gsm8k import get_scenario_name as get_scenario_name_gsm8k
+from .hf.gaia import load_scenario as load_scenario_gaia
+from .hf.gaia import get_scenario_name as get_scenario_name_gaia
 from .synthetic.smarthub_support import load_scenario as load_scenario_smarthub_support
 from .synthetic.smarthub_support import get_scenario_name as get_scenario_name_smarthub_support
 from .synthetic.blades_in_the_dark import load_scenario as load_scenario_blades_in_the_dark
@@ -96,5 +102,6 @@ def _load_scenarios() -> Dict[str, Scenario]:
         get_scenario_name_hotpotqa(): load_scenario_hotpotqa(),
         get_scenario_name_pubmedqa():load_scenario_pubmedqa(),
         get_scenario_name_aquarat():load_scenario_aquarat(),
+        get_scenario_name_gaia(): load_scenario_gaia(),
         get_scenario_name_bbh(): load_scenario_bbh(),
     }
