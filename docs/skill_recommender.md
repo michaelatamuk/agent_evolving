@@ -1,326 +1,362 @@
-# Skill Recommender — Query Pass
+# Skill Recommender — How It Works
 
-**Module**: `examples/offline/sage/skill_recommender/`
-
-The Skill Recommender is a **Contextual Bayesian Prompt-Skill Router**. Given a natural-language query it ranks all skills in the GEPA scoring matrix by how well they match the query, fusing up to four evidence streams: offline collaborative filtering, Bayesian arm posteriors, temporal freshness decay, and live execution embeddings. Each stream activates independently based on available state, so the recommender degrades gracefully from a full four-phase router down to a pure similarity search when no optional state is present.
+**Location**: `examples/offline/sage/skill_recommender/`
 
 ---
 
-## Architecture Overview
+## What Does This Do?
+
+When you ask a question, the Skill Recommender picks the best skill to answer it.
+
+A **skill** is a prompt template — a set of instructions that tells an AI how to behave in a specific domain. Examples: `"code-review"`, `"smarthub-support"`, `"gsm8k"`. The system can have dozens of them.
+
+The recommender looks at the question and scores every skill by how relevant it is, then returns a ranked list. The caller uses the top result to decide which skill to apply.
+
+```mermaid
+graph LR
+    Q["Your question"] --> R["Skill Recommender"]
+    R --> L["Ranked list of skills\n#1 smarthub-support  0.87\n#2 code-review       0.61\n#3 api-security      0.44"]
+    L --> USE["Use the top skill\nto answer the question"]
+```
+
+---
+
+## Where Does It Get Its Data?
+
+The recommender does not know anything on its own. It learns from three sources that are created by other parts of the system:
 
 ```mermaid
 graph TD
-    CLI["CLI / runner.py"]
-    Args["runner_args.py\nargparse.Namespace"]
-    MR["query/mode_runner.py\n_run_query()"]
-    BR["recommender_builder.py\nbuild_recommender()"]
-    SM["reccmmender_scores_matrix.py\nload_scores_matrix()"]
-    SR["recommender.py\nSkillRecommender"]
-    EM["recommender_similarities_computer.py\nEmbedder"]
+    GEPA["GEPA Optimizer\n(runs offline, improves skills)"]
+    GEPA -->|"scoring_matrix_*.json\nHow well each skill performed\non test examples"| SM
 
-    P1["Phase 1/2\nts_skill_scheduler.json\nThompson arm state"]
-    P3A["skill_context_store.py\nSkillContextStore"]
-    P3B["contextual_matrix.py\nContextualMatrix"]
+    GEPA -->|"ts_skill_scheduler.json\nWhich skills improved\nover time"| TS
 
-    CLI --> Args
-    Args --> MR
-    MR --> BR
-    BR --> SM
-    SM -->|"scoring_matrix_*.json"| SR
-    BR --> SR
-    SR --> EM
-    P1 -->|"read-only at init"| SR
-    P3A -->|"read-only at init"| SR
-    P3B -->|"read-only at init"| SR
+    LIVE["Live usage\n(after deployment)"]
+    LIVE -->|"context_store.json\ncontextual_matrix.json\nWhich questions each skill\nhandled well"| CTX
 
-    SR -->|"recommend(query)"| OUT["Ranked skill list"]
+    SM["Evidence layer 1\nPast test scores"]
+    TS["Evidence layer 2\nEvolution track record"]
+    CTX["Evidence layer 3\nLive usage history"]
 
-    style P1 fill:#fef9c3,stroke:#ca8a04
-    style P3A fill:#dcfce7,stroke:#16a34a
-    style P3B fill:#dcfce7,stroke:#16a34a
+    SM --> REC["Skill Recommender"]
+    TS --> REC
+    CTX --> REC
 ```
 
----
-
-## Entry Point — CLI Arguments
-
-**Runner**: `examples/offline/sage/skill_recommender/runner.py`
-**Args parser**: `runner_args.py → args_parser(DEFAULT_ORACLE_DIR)`
-
-| Argument | Type | Default | Purpose |
-|---|---|---|---|
-| `query` | str | — | Prompt to route; `-` reads from stdin |
-| `--from-file PATH` | Path | — | File with one query per line |
-| `--list-skills` | flag | — | Print all skills from matrix and exit |
-| `--data-dir PATH` | Path | `~/.openjiuwen/oracle` | Directory containing `scoring_matrix_*.json` files |
-| `--variant` | str | `"baseline"` | Matrix layer to load: `baseline`, `evolved`, or `both` |
-| `--embedder` | str | `"tfidf"` | Embedding backend: `tfidf` (offline) or `openai` (semantic) |
-| `--sim-threshold` | float | `0.25` | Minimum cosine similarity to consider an example relevant |
-| `--score-threshold` | float | `0.20` | Minimum final blended score to include a result |
-| `--top-k` | int | `10` | Maximum results returned |
-| `--min-examples` | int | `1` | Minimum similar matrix rows a skill must have |
-| `--cache-embedder PATH` | Path | — | Persist fitted TF-IDF vectorizer to disk |
-| `--ts-state-path PATH` | Path | `~/.openjiuwen/ts_router_state/ts_skill_scheduler.json` | Phase 1/2: Thompson arm state |
-| `--freshness-lambda` | float | `0.05` | Phase 2: exponential decay rate per day (≈ 14-day half-life) |
-| `--context-state-dir PATH` | Path | `~/.openjiuwen/context_state` | Phase 3: directory for `context_store.json` and `contextual_matrix.json` |
+The recommender is **read-only** while answering questions. All three data sources are written by other processes (GEPA, or the deployment layer). The recommender just reads them at startup.
 
 ---
 
-## Query Pipeline — Full Data Flow
+## The Four Scoring Signals
 
-```mermaid
-flowchart TD
-    A["query string"] --> B["Embedder.similarities(query)\ncompute cosine sim with every matrix row"]
-    A --> B2["Embedder.dense_embed(query)\nL2-normalised dense vector\nonly if Phase 3 active"]
+To score a skill for a given question, the recommender combines up to four signals. Each signal answers a different question about the skill:
 
-    B --> C{"sim >= sim_threshold?"}
-    C -- "No rows pass" --> EMPTY["return []"]
-    C -- "Rows pass" --> D["sub_df = matrix rows that pass"]
+| Signal | Plain English question | Source |
+|---|---|---|
+| **Similarity score** (Phase 0) | "Has this skill seen similar questions before, and how did it score?" | Past test scores |
+| **Track record** (Phase 1) | "Has this skill been consistently improving during evolution?" | Evolution history |
+| **Freshness** (Phase 2) | "Is that track record recent, or from months ago?" | Evolution history (timestamp) |
+| **Live context match** (Phase 3) | "Have real users asked this kind of question and picked this skill?" | Live usage history |
 
-    D --> E["GROUP BY skill_name"]
+Not all signals are always available. The recommender uses whichever data it can find and skips the rest.
 
-    E --> F["For each skill"]
+---
 
-    F --> G0["PHASE 0\nCollaborative score\nweighted avg of norm_scores"]
-    F --> G1["PHASE 1\nLoad α, β from ts_arms\nbayes_conf = α/(α+β)\nunc_sample ~ Beta(α,β)"]
-    F --> G2["PHASE 2\nfreshness = exp(−λ × days)\nneeds Phase 1 state"]
-    F --> G3A["PHASE 3a\ncontext_match\n= cosine(query_vec, skill_emb)\n0.5 if cold-start"]
-    F --> G3B["PHASE 3b\nonline_collab\n= sim-weighted avg reward\nfrom top-k past queries\n0.5 if no observations"]
+## Signal 1 — Similarity Score (always active)
 
-    G0 --> FUSE
-    G1 --> FUSE
-    G2 --> FUSE
-    G3A --> FUSE
-    G3B --> FUSE
+**The idea**: Find all the test examples this skill was evaluated on that look similar to your question. Average their fitness scores, weighted by how similar they are.
 
-    FUSE["FUSION\nfinal_score = Σ(w_i × v_i) / Σ(w_i)\nonly active components\nweights re-normalised to 1"]
+### The matrix — rows are prompts, columns are skills
 
-    FUSE --> FILTER{"final_score >= score_threshold\nn_rows >= min_examples?"}
-    FILTER -- Yes --> RESULT["append result dict"]
-    FILTER -- No --> SKIP["skip"]
+GEPA evaluated each skill on its own set of test examples (prompts) and recorded how well the skill answered each one. The result is a matrix:
 
-    RESULT --> SORT["sort descending by score"]
-    SORT --> TRUNC["truncate to top_k"]
-    TRUNC --> OUT["return list[dict]"]
+```
+                                        ┌──────────────┬──────────────────┬──────────────┐
+                                        │ code-review  │ smarthub-support │ api-security │
+ ┌──────────────────────────────────────┼──────────────┼──────────────────┼──────────────┤
+ │ "Review Python function for          │     0.56     │        —         │      —       │
+ │  thread safety: def add(x):..."      │              │                  │              │
+ ├──────────────────────────────────────┼──────────────┼──────────────────┼──────────────┤
+ │ "Review Python function for          │     0.55     │        —         │      —       │
+ │  performance: def find(lst):..."     │              │                  │              │
+ ├──────────────────────────────────────┼──────────────┼──────────────────┼──────────────┤
+ │ "My SmartHub keeps dropping          │      —       │      0.58        │      —       │
+ │  WiFi every hour."                   │              │                  │              │
+ ├──────────────────────────────────────┼──────────────┼──────────────────┼──────────────┤
+ │ "My SmartHub shows 3 red blinks."    │      —       │      0.71        │      —       │
+ ├──────────────────────────────────────┼──────────────┼──────────────────┼──────────────┤
+ │ "Review this REST endpoint for       │      —       │        —         │     0.69     │
+ │  SQL injection risk."                │              │                  │              │
+ ├──────────────────────────────────────┼──────────────┼──────────────────┼──────────────┤
+ │ "Review this Flask route for         │      —       │        —         │     0.74     │
+ │  missing auth check."                │              │                  │              │
+ └──────────────────────────────────────┴──────────────┴──────────────────┴──────────────┘
+         ↑ rows = prompts (test examples)                ↑ columns = skills
+         (hundreds to thousands of rows)                 (one column per skill)
 ```
 
----
+**Cell value** = fitness score (0 to 1): how well that skill answered that prompt during GEPA evaluation.
 
-## Scoring Matrix — What Gets Loaded
+**`—` (dash)** = this prompt was not used to evaluate that skill. Each skill is tested only on its own training examples, so most cells are empty.
 
-`load_scores_matrix(oracle_dir, variant)` reads all `scoring_matrix_*.json` files from the oracle directory and flattens the 3-D structure (skill × example × metric) into a DataFrame.
+### How a new query uses this matrix — step by step
 
-**Auto-detected formats**:
-- **Real GEPA output** — has both `"matrix"` and `"cross_eval"` keys; reads from `cross_eval`
-- **Synthetic benchmark** — has `"baseline_cross_eval"` / `"evolved_cross_eval"` keys; reads the requested variant
+Your question: *"Review this Go function for race conditions"*
 
-**Key DataFrame columns**:
+**Step 1 — measure similarity of your question to every prompt row:**
 
-| Column | Content |
-|---|---|
-| `skill_name` | Name of the skill (`str`) |
-| `example_input` | The input text used for this evaluation row |
-| `example_expected` | Reference expected output (truncated to 300 chars) |
-| `candidate_output` | Skill output produced during GEPA evaluation |
-| `score_<metric>` | Raw fitness score for each metric (float or `None`) |
-| `norm_<metric>` | Row-normalised score: `score / Σ all scores for this row` |
-
-Row normalisation ensures all metric scores are on a comparable [0, 1] scale regardless of their absolute magnitudes.
-
----
-
-## Embedder — Similarity Engine
-
-**Class**: `Embedder` in `recommender_similarities_computer.py`
-
-The embedder is fitted once on all `example_input` texts from the matrix at recommender initialisation. At query time it computes similarity against this fixed corpus.
-
-```mermaid
-flowchart LR
-    subgraph INIT["Initialisation (once)"]
-        T1["All example_input texts"]
-        T2["Embedder.fit(texts)"]
-        T1 --> T2
-        T2 -->|TF-IDF| V1["Sparse TF-IDF matrix\n(n_rows × 10 000 dims)"]
-        T2 -->|OpenAI| V2["Dense embedding matrix\n(n_rows × 1 536 dims)"]
-    end
-
-    subgraph QUERY["Per query"]
-        Q["query string"]
-        Q -->|TF-IDF| S1["vectorizer.transform(query)\n→ cosine_similarity(q, matrix)\n→ float array (n_rows,)"]
-        Q -->|OpenAI| S2["embed_openai([query])\n→ matrix @ q_vec\n→ float array (n_rows,)"]
-        Q --> DE["dense_embed(query)\nfor Phase 3 only\n→ L2-normalised (10 000,) or (1 536,)"]
-    end
+```
+                                        sim to your question
+ "Review Python function / thread safety"   →   0.81  ← very similar (code + safety topic)
+ "Review Python function / performance"     →   0.54  ← somewhat similar (code review topic)
+ "SmartHub WiFi dropping"                   →   0.06  ← unrelated  ✗ below threshold, ignored
+ "SmartHub 3 red blinks"                    →   0.04  ← unrelated  ✗ below threshold, ignored
+ "REST endpoint / SQL injection"            →   0.31  ← weak match ✗ below threshold, ignored
+ "Flask route / auth check"                 →   0.29  ← weak match ✗ below threshold, ignored
 ```
 
-**TF-IDF settings**: `ngram_range=(1, 2)`, `max_features=10 000`, `sublinear_tf=True`
+**Step 2 — for each skill, collect only rows above the threshold and compute a weighted average:**
 
-**Embedder cache**: If `--cache-embedder` is provided, the fitted Embedder is pickled to disk and reloaded on the next run, skipping the fit step.
+```
+code-review:
+    row 1: similarity 0.81 × score 0.56 = 0.454
+    row 2: similarity 0.54 × score 0.55 = 0.297
+    ─────────────────────────────────────────────
+    Signal 1 score = (0.454 + 0.297) / (0.81 + 0.54) = 0.556  ✓
+
+smarthub-support:
+    no rows passed the threshold
+    → excluded from results
+
+api-security:
+    no rows passed the threshold
+    → excluded from results
+```
+
+`code-review` is the only skill with matching rows → Signal 1 score = **0.556**.
+
+### Where does this matrix come from?
+
+`scoring_matrix_*.json` — produced by GEPA after each evaluation run. Each row is stored as a JSON object with the prompt text, the expected answer, what the skill actually produced, and the fitness scores:
+
+```json
+{
+  "skill_name":       "code-review",
+  "example_input":    "Review this Python function for thread safety: def add(x): self.total += x",
+  "example_expected": "Flag the missing lock — concurrent calls will corrupt self.total.",
+  "candidate_output": "There may be a thread-safety issue here.",
+  "norm_semantic":    0.56,
+  "norm_bag_of_words": 0.44
+}
+```
+
+**How similarity is measured**: Every text is converted to a vector of numbers (either TF-IDF word frequencies, or OpenAI embeddings). Similarity is how closely the two vectors point in the same direction — 1.0 means identical, 0.0 means nothing in common.
 
 ---
 
-## Phase 0 — Offline Collaborative Score
+## Signal 2 — Evolution Track Record (Phase 1)
 
-Always active. The baseline signal.
+**The idea**: Every time GEPA finishes working on a skill, it records whether the result was better than the starting point. Signal 2 reads that history and uses it as a confidence score.
 
-For each skill and metric, the collaborative score is the similarity-weighted average of the normalised fitness scores across all matrix rows that passed the similarity threshold:
+### What one GEPA run means
 
-$$f_\text{collab}(S_i, P) = \frac{\sum_{j \in \mathcal{N}(P)} \text{sim}(P, x_j) \cdot \text{norm\_score}_{j}}{\sum_{j \in \mathcal{N}(P)} \text{sim}(P, x_j)}$$
+When GEPA processes a skill, it runs the optimizer for N epochs (as configured). Each epoch tries various candidate improvements against training examples, picks the best candidate, and moves on to the next example. At the end of all epochs, it computes one single number: **did the final skill score higher than the baseline skill?** That difference is the `improvement` value.
 
-where $\mathcal{N}(P)$ is the set of matrix rows with cosine similarity $\ge$ `sim_threshold`.
+After GEPA finishes one complete skill run, it calls the update in `skill_evolver_batch.py`:
 
-This is computed independently for each metric column (`norm_bag_of_words`, `norm_semantic`, etc.), producing one collaborative score per (skill, metric) pair. Each pair becomes a candidate result entry.
+```
+improvement = (final evolved score) − (baseline score)
 
----
+if improvement > 0:   alpha += 1   ← skill got better
+else:                 beta  += 1   ← skill did not get better
+```
 
-## Phase 1 — Bayesian Exploitation and Exploration
+So alpha and beta count **completed GEPA runs**, not individual epochs or individual examples.
 
-**Activates when**: `ts_skill_scheduler.json` exists and can be loaded.
+### The two counters
 
-The Thompson arm state file maps each skill name to its Beta distribution parameters accumulated during offline GEPA optimisation runs:
+Every skill has two counters (called an "arm"):
+- `alpha` — GEPA runs that ended with a score improvement
+- `beta` — GEPA runs that ended with no improvement (or a regression)
+
+**Example**: `smarthub-support` with `alpha=10, beta=2` means GEPA ran 12 times on this skill, and 10 of those runs resulted in a measurably better skill.
+
+**Confidence** = `alpha / (alpha + beta)` = 10 / 12 = **0.83**
+
+### What "no improvement" actually means — and what it does not
+
+A high `beta` (many failures) does **not** necessarily mean the skill is immature or poor quality. It could equally mean the skill is **already close to optimal** — so GEPA consistently cannot find anything better. The recommender treats a high-alpha skill as a "safe bet" because it has demonstrated it can absorb improvement, but a high-beta skill is not penalised in any absolute sense — its contribution just carries less weight relative to Signal 1.
+
+### Why alpha and beta can be fractional (e.g. 10.5, 2.3)
+
+When running in demo mode (`trainings.py`), the system uses a **soft update** instead of the binary +1 / +1 above. The improvement score is converted to a value between 0 and 1, and that fraction is added directly:
+
+```
+reward = clamp(improvement + 0.5, 0.0, 1.0)
+
+alpha += reward        (e.g. 0.8)
+beta  += 1 − reward    (e.g. 0.2)
+```
+
+So after 12 soft-update runs with varying improvement levels, you get fractional totals like `alpha=10.5, beta=2.3`. The binary update (used in batch mode) always adds whole numbers.
+
+### The exploration draw
+
+Alongside the win rate, the recommender also takes one random draw from the arm's probability distribution. This adds a small random boost that is larger when the arm has fewer observations. The practical effect: a skill with only 2 runs gets a wider random range, so it occasionally surfaces higher in the ranking even if its win rate looks mediocre. This prevents the recommender from permanently ignoring skills that have simply been run fewer times.
+
+### What file stores this?
+
+`ts_skill_scheduler.json` — written by GEPA after every skill run, and read by the recommender at startup:
 
 ```json
 {
     "smarthub-support": {
         "alpha": 10.5,
-        "beta":  2.3,
+        "beta": 2.3,
+        "n_runs": 12,
         "last_success_at": 1718916234.5678
+    },
+    "code-review": {
+        "alpha": 4.1,
+        "beta": 6.9,
+        "n_runs": 11,
+        "last_success_at": 1717800000.0
     }
 }
 ```
 
-Two signals are extracted per skill at query time:
+`n_runs` is informational only (the total run count). `last_success_at` is a Unix timestamp — used by Signal 3 (freshness).
 
-**Bayesian Confidence** (exploitation):
+**If a skill is not in this file** (GEPA has never run on it): the recommender assumes `alpha=1, beta=1`, which gives a win rate of 0.5 — neutral, neither favoured nor penalised.
 
-$$\mu_i = \frac{\alpha_i}{\alpha_i + \beta_i} \in [0, 1]$$
-
-High $\alpha$ relative to $\beta$ means the skill has a strong track record of accepting evolutionary improvements — evidence it is a high-quality, responsive asset.
-
-**Uncertainty Sample** (exploration):
-
-$$\tilde{\theta}_i \sim \text{Beta}(\alpha_i, \beta_i)$$
-
-A random draw from the posterior. When $\alpha \approx \beta$ (few observations, high uncertainty) the draw has high variance, giving underexplored skills a chance to surface. When the posterior is tight ($\alpha \gg \beta$), the draw is reliably high.
-
-**Cold-start default** (skill not in state file): $\alpha = \beta = 1$ — the non-informative uniform prior, giving $\mu_i = 0.5$ and $\tilde{\theta}_i \sim \text{Uniform}(0, 1)$.
-
----
-
-## Phase 2 — Temporal Freshness Decay
-
-**Activates when**: Phase 1 is active AND `--freshness-lambda > 0`.
-
-Arm evidence accumulated months ago is less relevant than evidence from recent runs — a skill evolves, so stale posteriors may not reflect current quality. Freshness penalises the Bayesian signal by elapsed time:
-
-$$\tau_i = \exp(-\lambda \cdot \Delta t_i)$$
-
-where $\Delta t_i$ is days since `last_success_at` and $\lambda$ is the decay rate (`--freshness-lambda`, default 0.05).
-
-| Age | Freshness (λ = 0.05) |
-|---|---|
-| 0 days | 1.000 |
-| 7 days | 0.704 |
-| 14 days | 0.497 (≈ half-life) |
-| 30 days | 0.223 |
-| 60 days | 0.050 |
-
-**Special case**: if `last_success_at` is absent (skill never had a successful run), `freshness = 1.0` — unexplored skills are not penalised.
-
----
-
-## Phase 3 — Adaptive Context Embeddings and Online Collaborative Matrix
-
-**Activates when**: `--context-state-dir` is provided and the state files exist.
-
-Phase 3 captures live deployment utility — which queries each skill handles well — independently of the offline GEPA evaluation history.
-
-### 3a — Per-Skill Context Embeddings (`SkillContextStore`)
-
-**State file**: `context_state/context_store.json`
-
-Stores one L2-normalised embedding per skill — a running exponentially weighted average (EWA) of query vectors on which the skill was successfully executed:
-
-$$\mathbf{e}_{S_i} \leftarrow \frac{(1 - \eta_r)\,\mathbf{e}_{S_i} + \eta_r\,\hat{P}}{\|(1 - \eta_r)\,\mathbf{e}_{S_i} + \eta_r\,\hat{P}\|_2}, \qquad \eta_r = \eta_0 \cdot r$$
-
-where $\hat{P}$ is the L2-normalised query embedding, $r \in [0,1]$ is the observed reward, and $\eta_0 = 0.10$ is the base EWA rate. Zero-reward executions are skipped entirely (no update, no I/O).
-
-At query time, the **context match score** is the cosine similarity between the current query and the skill's accumulated context:
-
-$$f_\text{ctx}(S_i, P) = \langle \hat{P},\, \mathbf{e}_{S_i} \rangle \in [0, 1]$$
-
-Cold-start default: `0.5` (neutral — neither promotes nor penalises).
-
-### 3b — Online Prompt-Skill Utility Matrix (`ContextualMatrix`)
-
-**State file**: `context_state/contextual_matrix.json`
-
-A rolling buffer of at most 1 000 `(query_vec, skill, reward)` triples, with oldest entries evicted FIFO when the cap is reached.
-
-At query time, the **online collaborative score** is the similarity-weighted average reward from the top-k most similar past queries for this skill:
-
-$$f_\text{online}(S_i, P) = \frac{\displaystyle\sum_{j \in \text{top-}k(S_i, P)} \text{sim}(\hat{P}, \hat{P}_j) \cdot r_j}{\displaystyle\sum_{j \in \text{top-}k(S_i, P)} \text{sim}(\hat{P}, \hat{P}_j)}$$
-
-Cold-start default: `0.5` (no observations for this skill in the buffer).
+### How the file gets built step by step
 
 ```mermaid
 sequenceDiagram
-    participant Q as Query
-    participant CS as SkillContextStore
-    participant CM as ContextualMatrix
+    participant G as GEPA Optimizer\n(skill_evolver_batch.py)
+    participant F as ts_skill_scheduler.json
+    participant R as Skill Recommender
 
-    Q->>CS: context_match(skill, query_vec)
-    CS-->>Q: cosine(query_vec, skill_embedding) ∈ [0,1]<br/>or 0.5 if no history
+    Note over G: First batch run — file does not exist yet
+    G->>G: Run all N epochs for "smarthub-support"\nFinal score > baseline → improvement = +0.12
+    G->>F: alpha += 1  →  smarthub: alpha=2, beta=1
+    G->>G: Run all N epochs for "code-review"\nFinal score ≤ baseline → improvement = −0.03
+    G->>F: beta += 1   →  code-review: alpha=1, beta=2
 
-    Q->>CM: collaborative_score(query_vec, skill)
-    CM->>CM: filter entries for this skill
-    CM->>CM: compute similarities to query_vec
-    CM->>CM: take top-k by similarity
-    CM-->>Q: Σ(sim × reward) / Σ(sim) ∈ [0,1]<br/>or 0.5 if no observations
+    Note over G: Second batch run
+    G->>G: "smarthub-support" improves again
+    G->>F: alpha=3, beta=1
+    G->>G: "code-review" improves this time
+    G->>F: alpha=2, beta=2
+
+    Note over G: After many batch runs
+    G->>F: smarthub: alpha=10.5, beta=2.3  (improved most runs)
+    G->>F: code-review: alpha=4.1, beta=6.9 (improved fewer runs)
+
+    Note over R: Recommender starts up — reads file once
+    R->>F: load scoreboard
+    F-->>R: smarthub win rate = 10.5/12.8 = 0.82\ncode-review win rate = 4.1/11.0 = 0.37
 ```
 
 ---
 
-## Fusion — Weighted Score Composition
+## Signal 3 — Freshness (Phase 2)
 
-All active component scores are merged into a single final score with dynamic weight normalisation:
+**The idea**: The track record in Signal 2 can be months old. A skill that was successfully improved yesterday is more reliable evidence than one whose last successful run was six months ago — because the skill itself may have changed significantly since then. Signal 3 reduces the weight of Signal 2 based on how much time has passed since the last successful GEPA run.
 
-$$r(S_i, P) = \frac{\displaystyle\sum_{c \in \mathcal{A}} w_c \cdot v_c}{\displaystyle\sum_{c \in \mathcal{A}} w_c}$$
+### Who records "last success" and when?
 
-where $\mathcal{A}$ is the set of active components for this query. Normalising by $\sum w_c$ (rather than a fixed denominator) ensures $r \in [0,1]$ regardless of which phases are enabled.
+The same `skill_evolver_batch.py` code that updates alpha/beta also records the timestamp. Specifically, inside the arm's update logic:
 
-**Default component weights**:
+```
+Binary mode:  if improvement > 0   →  last_success_at = now()
+Soft mode:    if reward > 0.5      →  last_success_at = now()
+```
 
-| Phase | Component | Weight | Activation condition |
-|---|---|---|---|
-| 0 | `collaborative_score` | 0.35 | Always |
-| 1 | `bayesian_confidence` | 0.20 | Thompson state file exists |
-| 1 | `uncertainty_sample` | 0.15 | Thompson state file exists |
-| 2 | `freshness` | 0.10 | Phase 1 active AND `lambda > 0` |
-| 3 | `context_match` | 0.15 | `SkillContextStore` provided |
-| 3 | `online_collaborative` | 0.05 | `ContextualMatrix` has observations for this skill |
-| | **Total (all active)** | **1.00** | |
+"Success" here means the same thing as in Signal 2: one complete GEPA run produced a measurably better skill. The timestamp is saved immediately to `ts_skill_scheduler.json` alongside alpha and beta (see the `last_success_at` field in the JSON example above).
 
-**Example: Phase 0 only (no optional state)**
+The recommender reads this timestamp at startup and computes how many days have passed since then.
 
-Active weights: `{collaborative: 0.35}` → total = 0.35 → normalised weight = 1.0 → `final_score = collaborative_score`.
+### What about skills that have never been run, or have never succeeded?
 
-**Example: Phases 0 + 1 (Thompson state present, no Phase 2/3)**
+If `last_success_at` is absent from the file (the skill has never had a single successful GEPA run, or has never been run at all), the freshness score is set to **1.0** — full weight, no penalty.
 
-Active weights: `{collab: 0.35, bayes_conf: 0.20, unc_sample: 0.15}` → total = 0.70
-→ effective weights: `{0.50, 0.286, 0.214}`
+The reasoning: it would be unfair to penalise a skill purely because it has not been tried yet. An untested skill is "fresh" by definition — we simply have no stale evidence to discount.
+
+### How the penalty works
+
+The penalty decays with time. A skill improved yesterday has freshness 1.0. One last improved 14 days ago has freshness ~0.5. One from 60 days ago is nearly ignored.
+
+| Days since last success | Freshness score |
+|---|---|
+| 0 days (today) | 1.00 |
+| 7 days | 0.70 |
+| 14 days | 0.50 |
+| 30 days | 0.22 |
+| 60 days | 0.05 |
+| Never succeeded (or never run) | **1.00** (no penalty) |
+
+---
+
+## Signal 4 — Live Context Match (Phase 3)
+
+**The idea**: After a skill is deployed and real users start using it, we can record which queries it handled well. Signal 4 uses that live usage history to ask: "Has this skill seen queries like this before, and how did it do?"
+
+This is separate from the offline test scores (Signal 1). Signal 1 comes from structured evaluation by GEPA. Signal 4 comes from real, unpredictable usage in production.
+
+**Two sub-signals**:
+
+**4a — Skill fingerprint** (`context_store.json`): Each skill accumulates a single "fingerprint" — a running average of the query embeddings that it handled well. Over time, a skill that's been used for customer support questions will develop a fingerprint that points toward customer support language. When a new query comes in, we measure how similar it is to that fingerprint.
+
+**4b — Past query lookup** (`contextual_matrix.json`): A rolling log of the last 1000 real queries, each tagged with which skill was used and how well it scored. When a new query arrives, we find the most similar past queries and average the scores that skill received on them.
+
+**What files does this use?**
+
+These files live in the `--context-state-dir` folder and are updated by the deployment layer (not GEPA):
+
+- `context_store.json` — one embedding vector per skill (a list of ~10 000 numbers). Not human-readable.
+- `contextual_matrix.json` — a log of past `(query, skill, reward)` triples. The oldest entries are dropped when the log exceeds 1000 entries.
+
+**If no live usage data exists yet**: both sub-signals return 0.5 (neutral). The system does not crash or degrade — it just uses fewer signals.
+
+---
+
+## Combining the Signals — Final Score
+
+All active signals are blended into a single score between 0 and 1. Each signal has a weight. If a signal is not available, its weight is dropped and the remaining weights are rescaled so they still sum to 1.
+
+**Default weights when all signals are available:**
+
+| Signal | Weight |
+|---|---|
+| Similarity score (Phase 0) | 35% |
+| Confidence — win rate (Phase 1) | 20% |
+| Confidence — exploration draw (Phase 1) | 15% |
+| Freshness (Phase 2) | 10% |
+| Live fingerprint match (Phase 3) | 15% |
+| Live past-query lookup (Phase 3) | 5% |
+| **Total** | **100%** |
+
+**Example: only Signal 1 is available** (no evolution history, no live usage):
+
+The 35% weight gets rescaled to 100%. Final score = similarity score alone.
+
+**Example: Signals 1 + 2 available** (evolution history exists, no live usage):
+
+Weights are 35 + 20 + 15 = 70%. Rescaled: similarity=50%, win-rate=29%, exploration=21%.
 
 ```mermaid
 flowchart LR
-    C0["collaborative_score\n× 0.35"] --> SUM
-    C1A["bayesian_confidence\n× 0.20"] --> SUM
-    C1B["uncertainty_sample\n× 0.15"] --> SUM
-    C2["freshness\n× 0.10"] --> SUM
-    C3A["context_match\n× 0.15"] --> SUM
-    C3B["online_collab\n× 0.05"] --> SUM
+    C0["Similarity score\n(35%)"] --> SUM
+    C1A["Win rate\n(20%)"] --> SUM
+    C1B["Exploration draw\n(15%)"] --> SUM
+    C2["Freshness\n(10%)"] --> SUM
+    C3A["Live fingerprint\n(15%)"] --> SUM
+    C3B["Past query log\n(5%)"] --> SUM
 
-    SUM["Σ(w_i × v_i)"] --> NORM["÷ Σ(w_i)\nactive only"]
-    NORM --> SCORE["final_score ∈ [0, 1]"]
+    SUM["Add weighted scores"] --> NORM["Divide by total\nactive weight"]
+    NORM --> SCORE["Final score\n0 to 1"]
 
     style C2 fill:#fef9c3,stroke:#ca8a04
     style C1A fill:#fef9c3,stroke:#ca8a04
@@ -331,102 +367,94 @@ flowchart LR
 
 ---
 
-## Phase Activation Map
-
-The four phases activate in layers depending on what state is available on disk:
+## What Signals Are Available Depends on What Files Exist
 
 ```mermaid
 flowchart TD
-    START["Recommender initialised"]
+    START["Recommender starts up"]
 
-    START --> P0["Phase 0 active\nOffline collaborative score\nalways on"]
+    START --> P0["Signal 1 always active\n(reads scoring_matrix_*.json)"]
 
-    P0 --> TSCHECK{"ts_skill_scheduler.json\nexists?"}
-    TSCHECK -- No --> NOTS["Phases 1 and 2 inactive\nbayes_conf = 0.5 (prior)\nfreshness = 1.0 (neutral)"]
-    TSCHECK -- Yes --> P1["Phase 1 active\nbayes_conf = α/(α+β)\nunc_sample ~ Beta(α,β)"]
+    P0 --> TSCHECK{"ts_skill_scheduler.json\nfound?"}
+    TSCHECK -- No --> NOTS["Signals 2 and 3 inactive\nWin rate = 0.5, Freshness = 1.0"]
+    TSCHECK -- Yes --> P1["Signal 2 active\nReads win rate and exploration draw\nfor each skill"]
 
-    P1 --> LAMBDACHECK{"freshness_lambda > 0?"}
-    LAMBDACHECK -- No --> NOP2["Phase 2 inactive\nfreshness = 1.0"]
-    LAMBDACHECK -- Yes --> P2["Phase 2 active\nfreshness = exp(−λ × days)"]
+    P1 --> LAMBDACHECK{"freshness decay\nenabled?"}
+    LAMBDACHECK -- No --> NOP2["Signal 3 inactive"]
+    LAMBDACHECK -- Yes --> P2["Signal 3 active\nReads last_success_at timestamp\nand applies time penalty"]
 
-    START --> CTXCHECK{"context_state_dir\nprovided?"}
-    CTXCHECK -- No --> NOCTX["Phase 3 inactive\ncontext_match = 0.5\nonline_collab = 0.5"]
-    CTXCHECK -- Yes --> P3["Phase 3 active\nSkillContextStore\nContextualMatrix"]
+    START --> CTXCHECK{"context-state-dir\nfound?"}
+    CTXCHECK -- No --> NOCTX["Signal 4 inactive\nFingerprint = 0.5, Past queries = 0.5"]
+    CTXCHECK -- Yes --> P3["Signal 4 active\nReads context_store.json\nand contextual_matrix.json"]
 
-    P3 --> HISTCHECK{"Has execution\nhistory for skill?"}
-    HISTCHECK -- No --> COLD["Cold-start\ncontext_match = 0.5\nonline_collab = 0.5"]
-    HISTCHECK -- Yes --> LIVE["Live signals\ncontext_match ∈ [0,1]\nonline_collab ∈ [0,1]"]
+    P3 --> HISTCHECK{"Skill has been\nused before?"}
+    HISTCHECK -- No --> COLD["Cold start\nFingerprint = 0.5\nPast queries = 0.5"]
+    HISTCHECK -- Yes --> LIVE["Live signals\nComputed from real usage"]
 ```
 
 ---
 
-## Output Structure
+## What You Get Back
 
-`SkillRecommender.recommend()` returns a `list[dict]` sorted by `score` descending, truncated to `top_k`. Each entry:
+`recommend(query)` returns a list of results sorted by score (highest first), cut off at `top_k`:
 
 ```python
-{
-    "skill":                str,    # skill name
-    "metric":               str,    # fitness metric used as signal (e.g. "semantic")
-    "score":                float,  # final blended score ∈ [0, 1]
-    "collaborative_score":  float,  # Phase 0 score
-    # Present if Phase 1 active:
-    "bayesian_confidence":  float,  # posterior mean μ = α/(α+β)
-    "uncertainty_sample":   float,  # Beta(α,β) sample
-    # Present if Phase 2 active:
-    "freshness":            float,  # exp(-λ × days)
-    # Present if Phase 3 active:
-    "context_match":        float,  # cosine(query, skill_embedding)
-    "n_examples":           int,    # number of matrix rows that passed sim_threshold
-    "mean_similarity":      float,  # mean cosine similarity of those rows
-    "similar_examples": [           # top-3 most similar matrix rows
-        {
-            "input":      str,      # example_input (truncated to 160 chars)
-            "expected":   str,      # example_expected (truncated to 120 chars)
-            "output":     str,      # candidate_output (truncated to 160 chars)
-            "similarity": float,
-        },
-        ...
-    ],
-}
+[
+    {
+        "skill":               "smarthub-support",
+        "metric":              "semantic",
+        "score":               0.87,          # final blended score
+
+        # Signal 1 (always present):
+        "collaborative_score": 0.81,          # similarity-weighted test score
+
+        # Signal 2 (if evolution history exists):
+        "bayesian_confidence": 0.82,          # win rate  (alpha / alpha+beta)
+        "uncertainty_sample":  0.79,          # exploration draw
+
+        # Signal 3 (if freshness enabled):
+        "freshness":           0.94,          # 1.0 = evolved recently
+
+        # Signal 4 (if live context exists):
+        "context_match":       0.71,          # similarity to skill fingerprint
+
+        # Supporting info:
+        "n_examples":          8,             # how many test rows matched
+        "mean_similarity":     0.63,
+        "similar_examples": [                 # top-3 matching test rows
+            {
+                "input":      "My SmartHub shows 3 red blinks...",
+                "expected":   "Three red blinks indicate overtemperature...",
+                "output":     "I see your SmartHub is showing red lights...",
+                "similarity": 0.88,
+            }
+        ],
+    },
+    ...
+]
 ```
 
 ---
 
-## Disk I/O Summary
+## Files on Disk — Summary
 
-| File | Location | Read/Write | Phase |
+| File | Created by | Read by | Contains |
 |---|---|---|---|
-| `scoring_matrix_*.json` | `--data-dir` | Read once at init | 0 |
-| `ts_skill_scheduler.json` | `--ts-state-path` | Read once at init | 1/2 |
-| `context_store.json` | `--context-state-dir` | Read at init; written via `record()` | 3 |
-| `contextual_matrix.json` | `--context-state-dir` | Read at init; written via `record()` | 3 |
-| Embedder cache (`.pkl`) | `--cache-embedder` | Read or written at init | — |
+| `scoring_matrix_*.json` | GEPA optimizer | Recommender | Past test scores for every skill on every example |
+| `ts_skill_scheduler.json` | GEPA optimizer | Recommender | Win/loss scoreboard for every skill (alpha, beta, timestamp) |
+| `context_store.json` | Deployment layer | Recommender | One fingerprint vector per skill (from live usage) |
+| `contextual_matrix.json` | Deployment layer | Recommender | Log of last 1000 real queries with skill and score |
 
-The recommender is **read-only during `recommend()`**. Phase 3 state is updated only when the caller explicitly invokes `recommender.record(query_vec, skill_name, reward)` after observing execution outcome.
+The recommender reads all these files once at startup and never writes to them.
 
 ---
 
-## Cold-Start and Default Values
+## Default Values When Data Is Missing
 
-| Situation | Value returned | Reason |
+| Situation | Value used | Why |
 |---|---|---|
-| Skill not in Thompson state | `bayes_conf = 0.5`, `unc_sample ∈ [0,1]` | Beta(1,1) uninformed prior |
-| Skill never had a successful run | `freshness = 1.0` | Not penalised for never being tried |
-| Skill has no context embedding | `context_match = 0.5` | Neutral prior — no pull toward or away |
-| Skill has no matrix observations | `online_collab = 0.5` | Neutral — no collaborative evidence |
-| Query matches nothing above threshold | Returns `[]` | Empty result, no crash |
-
----
-
-## Key Formulas Reference
-
-| Formula | Description |
-|---|---|
-| $\frac{\sum_j \text{sim}_j \cdot \text{norm\_score}_j}{\sum_j \text{sim}_j}$ | Phase 0 collaborative score |
-| $\mu_i = \frac{\alpha_i}{\alpha_i + \beta_i}$ | Phase 1 Bayesian confidence |
-| $\tilde{\theta}_i \sim \text{Beta}(\alpha_i, \beta_i)$ | Phase 1 uncertainty sample |
-| $\exp(-\lambda \cdot \Delta t_i)$ | Phase 2 freshness decay |
-| $\langle \hat{P},\, \mathbf{e}_{S_i} \rangle$ | Phase 3a context match (cosine) |
-| $\frac{\sum_{j \in \text{top-}k} \text{sim}_j \cdot r_j}{\sum_{j \in \text{top-}k} \text{sim}_j}$ | Phase 3b online collaborative |
-| $\frac{\sum_{c \in \mathcal{A}} w_c v_c}{\sum_{c \in \mathcal{A}} w_c}$ | Final fusion (normalised) |
+| Skill not in evolution history | Win rate = 0.5 | "We don't know yet — treat it as neutral" |
+| Skill never successfully improved | Freshness = 1.0 | "Don't penalise a skill we've never tried" |
+| Skill has no live usage fingerprint | Fingerprint match = 0.5 | "No evidence either way" |
+| No similar past queries in log | Past-query score = 0.5 | "No evidence either way" |
+| Query matches nothing above threshold | Returns empty list | Normal — not an error |
